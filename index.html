@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=27.0">
+  <link rel="stylesheet" href="styles.css?v=28.0">
 </head>
 <body>
 
@@ -211,12 +211,11 @@
           <table class="timetable-table">
             <thead>
               <tr>
-                <th>#</th>
+                <th style="width: 22px; text-align: center;">#</th>
                 <th>Station</th>
-                <th>Arr</th>
-                <th>Dep</th>
-                <th>PF</th>
-                <th>Dist</th>
+                <th style="width: 44px; text-align: center;">Arr</th>
+                <th style="width: 44px; text-align: center;">Dep</th>
+                <th style="width: 38px; text-align: center;">PF</th>
               </tr>
             </thead>
             <tbody id="corridorTimetableBody">
@@ -299,18 +298,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v27.0) -->
-  <script src="data/trains.js?v=27.0"></script>
-  <script src="audio/chime.js?v=27.0"></script>
-  <script src="threeui-engine.js?v=27.0"></script>
-  <script src="app.js?v=27.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v28.0) -->
+  <script src="data/trains.js?v=28.0"></script>
+  <script src="audio/chime.js?v=28.0"></script>
+  <script src="threeui-engine.js?v=28.0"></script>
+  <script src="app.js?v=28.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=27.0')
+        navigator.serviceWorker.register('sw.js?v=28.0')
           .then(reg => {
-            console.log('Service Worker v27.0 active', reg);
+            console.log('Service Worker v28.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;

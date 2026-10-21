@@ -1,14 +1,14 @@
-// Service Worker for Chennai AC Local Train Tracker (v27.0 Automated Live Sync)
+// Service Worker for Chennai AC Local Train Tracker (v28.0 Timetable iPhone 15 Pro Optimization)
 // Strategy: Network-First with Cache Fallback & Instant Auto-Purge of Old Caches
-const CACHE_NAME = 'cgl-ms-tracker-v27-automated-sync';
+const CACHE_NAME = 'cgl-ms-tracker-v28-iphone15-timetable';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=27.0',
-  './threeui-engine.js?v=27.0',
-  './app.js?v=27.0',
-  './data/trains.js?v=27.0',
-  './audio/chime.js?v=27.0',
+  './styles.css?v=28.0',
+  './threeui-engine.js?v=28.0',
+  './app.js?v=28.0',
+  './data/trains.js?v=28.0',
+  './audio/chime.js?v=28.0',
   './icon.jpg',
   './manifest.json'
 ];

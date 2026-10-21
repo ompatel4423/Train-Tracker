@@ -466,7 +466,7 @@ class TrainTrackerApp {
         subText: `Scheduled Today · Origin: ${sourceStop.name} (${sourceStop.dep}) ➔ Target: ${targetStop.name} (${targetTimeStr} · PF ${targetPf})`,
         humanCountdown,
         currentStop: sourceStop,
-        nextStop: sched[1],
+        nextStop: null,
         progressPercent: 0,
         estimatedSpeedKmph: 0,
         targetStop,
@@ -507,8 +507,8 @@ class TrainTrackerApp {
         statusText: `Next Morning Service in ${hrs}h ${mins}m`,
         subText: `Departs Tomorrow at ${sourceStop.dep} AM from ${sourceStop.name} (PF ${this.getEffectivePlatform(sourceStop.code).number})`,
         humanCountdown,
-        currentStop: sourceStop,
-        nextStop: sched[1],
+        currentStop: null,
+        nextStop: null,
         progressPercent: 0,
         estimatedSpeedKmph: 0,
         targetStop,
@@ -599,14 +599,14 @@ class TrainTrackerApp {
     const targetTimeStr = targetStop.arr || targetStop.dep;
 
     return {
-      state: "running",
-      statusText: `Running on suburban corridor`,
+      state: "scheduled",
+      statusText: `Scheduled Suburban Service`,
       subText: `Chennai Beach - Chengalpattu line`,
       humanCountdown: `🚆 Arriving at ${targetStop.name} in ${hrs > 0 ? hrs + 'h ' : ''}${mins} minutes (at ${targetTimeStr} · PF ${targetPf})`,
       currentStop: sourceStop,
-      nextStop: sched[1],
-      progressPercent: 50,
-      estimatedSpeedKmph: 50,
+      nextStop: null,
+      progressPercent: 0,
+      estimatedSpeedKmph: 0,
       targetStop,
       targetArrTime,
       msUntilTarget,
@@ -1053,7 +1053,7 @@ class TrainTrackerApp {
     }
   }
 
-  // Render full corridor timetable table directly on the page
+  // Render full corridor timetable table directly on the page (Optimized for iPhone 15 Pro)
   renderTimetable() {
     const tbody = document.getElementById("corridorTimetableBody");
     const titleEl = document.getElementById("inlineTimetableTitle");
@@ -1063,23 +1063,33 @@ class TrainTrackerApp {
 
     const isMorning = this.currentTrainId === "49002";
     if (titleEl) {
-      titleEl.textContent = `TIMETABLE · TRAIN ${this.currentTrainId} (${isMorning ? 'CGL ➔ MS' : 'MS ➔ CGL'})`;
+      titleEl.textContent = `CORRIDOR TIMETABLE · ${isMorning ? 'CGL ➔ MS' : 'MS ➔ CGL'}`;
     }
     if (subTitleEl) {
-      subTitleEl.textContent = `16 Stations · ${isMorning ? 'Morning Office Commute (07:50 AM)' : 'Evening Home Commute (18:17 PM)'} · Delay: ${this.delayMinutes > 0 ? '+' + this.delayMinutes + 'm' : 'On Time'}`;
+      subTitleEl.textContent = `16 Stations · ${isMorning ? 'Morning Office (07:50 AM)' : 'Evening Commute (18:17 PM)'} · ${this.delayMinutes > 0 ? '+' + this.delayMinutes + 'm Delay' : 'On Time'}`;
     }
     if (rakeBadge) {
-      rakeBadge.textContent = isMorning ? "🌅 12-Car Medha AC EMU" : "🌆 12-Car Medha AC EMU";
+      rakeBadge.textContent = isMorning ? "🌅 12-Car Medha AC" : "🌆 12-Car Medha AC";
       rakeBadge.className = isMorning ? "ac-chip chip-morning" : "ac-chip chip-evening";
     }
 
     const currentStatus = this.calculateTrainStatus();
-    const nextCode = currentStatus.nextStop ? currentStatus.nextStop.code : null;
+    const isLiveRunning = currentStatus.state === "in_transit" || currentStatus.state === "halted";
+    const liveStopCode = isLiveRunning && currentStatus.nextStop ? currentStatus.nextStop.code : null;
+
+    // Commuter boarding and deboarding stations
+    const boardingCode = isMorning ? "CGL" : "MS";
+    const destCode = isMorning ? "MS" : "CGL";
+    const totalStops = this.trainData.schedule.length;
 
     tbody.innerHTML = this.trainData.schedule.map((stop, idx) => {
       const pf = this.getEffectivePlatform(stop.code);
-      const isCurrent = stop.code === nextCode;
-      
+      const isCurrent = isLiveRunning && (stop.code === liveStopCode);
+      const isBoarding = stop.code === boardingCode;
+      const isDest = stop.code === destCode;
+      const isTerminal = idx === totalStops - 1;
+      const isFirst = idx === 0;
+
       // Calculate adjusted times if delay applied
       let arrTime = stop.arr;
       let depTime = stop.dep;
@@ -1088,21 +1098,49 @@ class TrainTrackerApp {
         depTime = this.addMinutesToTime(stop.dep, this.delayMinutes);
       }
 
+      // Display '--' for origin Arr or destination Dep
+      if (isFirst) arrTime = "--";
+      if (isTerminal) depTime = "--";
+
+      // Contextual commuter badges
+      let tagHtml = "";
+      let rowClasses = [];
+
+      if (isCurrent) {
+        rowClasses.push("station-current");
+        tagHtml = `<span class="st-tag tag-live">● Live</span>`;
+      } else if (isBoarding) {
+        rowClasses.push("station-boarding");
+        tagHtml = `<span class="st-tag tag-board">Board</span>`;
+      } else if (isDest) {
+        rowClasses.push("station-dest");
+        tagHtml = `<span class="st-tag tag-dest">Deboard</span>`;
+      } else if (isTerminal) {
+        rowClasses.push("station-terminal");
+        tagHtml = `<span class="st-tag tag-term">Terminus</span>`;
+      }
+
       return `
-        <tr class="${isCurrent ? 'station-current' : ''}">
-          <td style="color: var(--text-dim); font-family: var(--font-mono); font-size: 0.75rem;">${idx + 1}</td>
-          <td>
+        <tr class="${rowClasses.join(' ')}">
+          <td class="st-idx">${idx + 1}</td>
+          <td class="st-name-td">
             <div class="st-name-cell">
-              <span class="st-name-en">${stop.name} (${stop.code})</span>
-              <span class="st-name-ta">${stop.nameTa || ''}</span>
+              <div class="st-name-top">
+                <span class="st-name-en">${stop.name}</span>
+                ${tagHtml}
+              </div>
+              <div class="st-name-sub">
+                <span class="st-name-ta">${stop.nameTa || ''}</span>
+                <span class="st-dist-dot">·</span>
+                <span class="st-dist-val">${stop.distanceKm} km</span>
+              </div>
             </div>
           </td>
           <td class="st-time">${arrTime}</td>
           <td class="st-time">${depTime}</td>
-          <td>
-            <span class="st-pf-badge ${pf.isOverridden ? 'pf-overridden' : ''}">PF ${pf.number}</span>
+          <td class="st-pf-td">
+            <span class="st-pf-badge">PF ${pf.number}</span>
           </td>
-          <td style="font-family: var(--font-mono); color: var(--text-dim); font-size: 0.75rem;">${stop.distanceKm} km</td>
         </tr>
       `;
     }).join('');
