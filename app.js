@@ -944,7 +944,7 @@ class TrainTrackerApp {
     if (this.apiConfig && this.apiConfig.rapidApiKey) {
       try {
         const trainNo = this.currentTrainId;
-        const url = `https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=${trainNo}&startDay=1`;
+        const url = `https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=${trainNo}&startDay=0`;
         const response = await fetch(url, {
           headers: {
             "X-RapidAPI-Key": this.apiConfig.rapidApiKey,

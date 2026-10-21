@@ -28,7 +28,7 @@ export default async function handler(request) {
     const rapidApiKey = process.env.RAPIDAPI_KEY || searchParams.get('key') || '9cf793d27dmsh7096fd3c254cbfep1eff33jsne6dff7d34ec2';
     if (rapidApiKey) {
       try {
-        const rapidUrl = `https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=${trainNo}&startDay=1`;
+        const rapidUrl = `https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=${trainNo}&startDay=0`;
         const res = await fetch(rapidUrl, {
           headers: {
             'X-RapidAPI-Key': rapidApiKey,
