@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=25.0">
+  <link rel="stylesheet" href="styles.css?v=26.0">
 </head>
 <body>
 
@@ -93,19 +93,6 @@
             <span>🕒</span>
             <span id="liveClock">--:--:--</span>
           </div>
-        </div>
-
-        <!-- Live On-Board Satellite GPS HUD Banner (Method 2) -->
-        <div id="gpsHudBanner" class="gps-hud-banner hidden">
-          <div class="gps-speed-chip">
-            <span class="gps-speed-num" id="gpsSpeedNum">0</span>
-            <span class="gps-speed-unit">KM/H</span>
-          </div>
-          <div class="gps-hud-info">
-            <div class="gps-hud-title" id="gpsHudTitle">🛰️ Locking Satellite GPS...</div>
-            <div class="gps-hud-sub" id="gpsHudSub">Southern Railway track proximity active</div>
-          </div>
-          <button id="gpsCloseBtn" class="gps-close-btn" type="button" title="Stop Onboard GPS">✕</button>
         </div>
 
         <div class="live-position-headline">
@@ -214,16 +201,37 @@
         </div>
       </div>
 
+      <!-- 2. Full Corridor Timetable (Directly visible on page, no click needed) -->
+      <section class="inline-timetable-card" id="corridorTimetableSection">
+        <div class="timetable-card-header">
+          <div class="timetable-card-title-group">
+            <h3 class="timetable-card-title" id="inlineTimetableTitle">CORRIDOR TIMETABLE · 16 STATIONS</h3>
+            <span class="timetable-card-subtitle" id="inlineTimetableSubtitle">Southern Railway AC EMU Schedule & Platforms</span>
+          </div>
+          <span class="ac-chip chip-evening" id="timetableRakeBadge">12-Car Medha AC EMU</span>
+        </div>
+
+        <div class="timetable-table-container">
+          <table class="timetable-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Station</th>
+                <th>Arr</th>
+                <th>Dep</th>
+                <th>PF</th>
+                <th>Dist</th>
+              </tr>
+            </thead>
+            <tbody id="corridorTimetableBody">
+              <!-- Dynamically populated with all 16 stations by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <!-- Commuter Action Toolbar -->
       <section class="commuter-toolbar">
-        <button id="gpsTrackingBtn" class="toolbar-btn gps-btn" type="button" title="Live Onboard Train GPS Speedometer & Proximity">
-          <span class="btn-icon">🧭</span>
-          <span class="btn-label" id="gpsBtnLabel">I'm Onboard (GPS)</span>
-        </button>
-        <button id="viewTimetableBtn" class="toolbar-btn" type="button" title="View Full 16-Station Corridor Schedule">
-          <span class="btn-icon">📋</span>
-          <span class="btn-label">Timetable</span>
-        </button>
         <button id="testAlarmBtn" class="toolbar-btn" type="button" title="Test Railway Chime & Voice PA Alert">
           <span class="btn-icon">🔔</span>
           <span class="btn-label">Test 10m Alarm</span>
@@ -277,41 +285,6 @@
     </div>
   </div>
 
-  <!-- CORRIDOR TIMETABLE MODAL -->
-  <div id="timetableModal" class="modal-backdrop">
-    <div class="modal-content modal-large">
-      <div class="modal-header">
-        <div>
-          <h3 id="timetableModalTitle">Corridor Timetable</h3>
-          <p class="modal-subtitle" id="timetableModalSubtitle">All 16 Stations · Southern Railway Schedule & Platforms</p>
-        </div>
-        <button class="close-btn close-modal" aria-label="Close modal">&times;</button>
-      </div>
-      <div class="modal-body timetable-modal-body">
-        <div class="timetable-table-container">
-          <table class="timetable-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Station</th>
-                <th>Arr</th>
-                <th>Dep</th>
-                <th>PF</th>
-                <th>Dist</th>
-              </tr>
-            </thead>
-            <tbody id="corridorTimetableBody">
-              <!-- Populated dynamically by app.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal-actions">
-        <button class="btn-secondary close-modal" style="width: 100%;">Close Timetable</button>
-      </div>
-    </div>
-  </div>
-
   <!-- DATA SOURCE & API MODAL -->
   <div id="apiSettingsModal" class="modal-backdrop">
     <div class="modal-content">
@@ -348,18 +321,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v25.0) -->
-  <script src="data/trains.js?v=25.0"></script>
-  <script src="audio/chime.js?v=25.0"></script>
-  <script src="threeui-engine.js?v=25.0"></script>
-  <script src="app.js?v=25.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v26.0) -->
+  <script src="data/trains.js?v=26.0"></script>
+  <script src="audio/chime.js?v=26.0"></script>
+  <script src="threeui-engine.js?v=26.0"></script>
+  <script src="app.js?v=26.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=25.0')
+        navigator.serviceWorker.register('sw.js?v=26.0')
           .then(reg => {
-            console.log('Service Worker v25.0 active', reg);
+            console.log('Service Worker v26.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;

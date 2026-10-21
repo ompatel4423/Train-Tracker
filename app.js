@@ -46,14 +46,6 @@ class TrainTrackerApp {
       customEndpoint: ""
     }));
 
-    // Method 2: Live Onboard Satellite GPS Speedometer & Proximity Engine
-    this.isGpsActive = false;
-    this.gpsWatchId = null;
-    this.lastGpsCoords = null;
-    this.lastGpsTimestamp = 0;
-    this.currentGpsSpeed = 0;
-    this.closestStation = null;
-
     this.timerInterval = null;
     this.apiInterval = null;
   }
@@ -273,30 +265,13 @@ class TrainTrackerApp {
       });
     });
 
-    // 10. View full corridor timetable
-    const viewTimetableBtn = document.getElementById("viewTimetableBtn");
-    if (viewTimetableBtn) {
-      viewTimetableBtn.addEventListener("click", () => this.openTimetableModal());
-    }
-
-    // 11. Test 10-minute alarm and chime
+    // 10. Test 10-minute alarm and chime
     const testAlarmBtn = document.getElementById("testAlarmBtn");
     if (testAlarmBtn) {
       testAlarmBtn.addEventListener("click", () => this.triggerTestAlarm());
     }
 
-    // 12. Method 2: Live Onboard Satellite GPS Tracking Toggle
-    const gpsBtn = document.getElementById("gpsTrackingBtn");
-    if (gpsBtn) {
-      gpsBtn.addEventListener("click", () => this.toggleGpsTracking());
-    }
-
-    const gpsCloseBtn = document.getElementById("gpsCloseBtn");
-    if (gpsCloseBtn) {
-      gpsCloseBtn.addEventListener("click", () => this.stopGpsTracking());
-    }
-
-    // 12. PWA Install Prompt
+    // 11. PWA Install Prompt
     this.setupPwaInstall();
   }
 
@@ -934,12 +909,6 @@ class TrainTrackerApp {
 
   // Automated Real-Time Live Sync: Delays & Southern Railway Platforms
   async syncLiveTrainStatus() {
-    // 0. If user is in Live GPS Onboard Mode, GPS takes priority as true physical ground truth
-    if (this.isGpsActive) {
-      this.updateSyncStatusNotice("🛰️ Live Satellite GPS Tracking Active (Onboard)");
-      return;
-    }
-
     // 1. If RapidAPI key is configured, query official IRCTC/NTES live endpoint
     if (this.apiConfig && this.apiConfig.rapidApiKey) {
       try {
@@ -1059,156 +1028,6 @@ class TrainTrackerApp {
     });
   }
 
-  // =========================================================================
-  // Method 2: Onboard Live Satellite GPS Speedometer & Proximity Engine
-  // =========================================================================
-  toggleGpsTracking() {
-    if (this.isGpsActive) {
-      this.stopGpsTracking();
-    } else {
-      this.startGpsTracking();
-    }
-  }
-
-  startGpsTracking() {
-    if (!("geolocation" in navigator)) {
-      alert("GPS Geolocation is not supported by your browser or device.");
-      return;
-    }
-
-    this.isGpsActive = true;
-    const gpsBtn = document.getElementById("gpsTrackingBtn");
-    const gpsBtnLabel = document.getElementById("gpsBtnLabel");
-    if (gpsBtn) gpsBtn.classList.add("active");
-    if (gpsBtnLabel) gpsBtnLabel.textContent = "GPS Active";
-
-    const hud = document.getElementById("gpsHudBanner");
-    if (hud) hud.classList.remove("hidden");
-
-    const hudTitle = document.getElementById("gpsHudTitle");
-    const hudSub = document.getElementById("gpsHudSub");
-    if (hudTitle) hudTitle.textContent = "🛰️ Connecting to Satellites...";
-    if (hudSub) hudSub.textContent = "Searching Southern Railway corridor";
-
-    this.gpsWatchId = navigator.geolocation.watchPosition(
-      (pos) => this.onGpsUpdate(pos),
-      (err) => this.onGpsError(err),
-      {
-        enableHighAccuracy: true,
-        maximumAge: 1500,
-        timeout: 10000
-      }
-    );
-  }
-
-  stopGpsTracking() {
-    if (this.gpsWatchId !== null) {
-      navigator.geolocation.clearWatch(this.gpsWatchId);
-      this.gpsWatchId = null;
-    }
-    this.isGpsActive = false;
-
-    const gpsBtn = document.getElementById("gpsTrackingBtn");
-    const gpsBtnLabel = document.getElementById("gpsBtnLabel");
-    if (gpsBtn) gpsBtn.classList.remove("active");
-    if (gpsBtnLabel) gpsBtnLabel.textContent = "I'm Onboard (GPS)";
-
-    const hud = document.getElementById("gpsHudBanner");
-    if (hud) hud.classList.add("hidden");
-
-    const liveSpeedVal = document.getElementById("liveSpeedVal");
-    if (liveSpeedVal) liveSpeedVal.textContent = "0 km/h";
-
-    this.syncLiveTrainStatus();
-  }
-
-  onGpsError(err) {
-    console.warn("GPS tracking notice:", err.message);
-    const hudTitle = document.getElementById("gpsHudTitle");
-    const hudSub = document.getElementById("gpsHudSub");
-    if (hudTitle) hudTitle.textContent = "🛰️ GPS Signal Acquiring...";
-    if (hudSub) hudSub.textContent = "Ensure Location permission is allowed in browser";
-  }
-
-  onGpsUpdate(pos) {
-    if (!this.isGpsActive || !pos || !pos.coords) return;
-
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
-    const now = pos.timestamp || Date.now();
-
-    // 1. Calculate Live Speed in km/h
-    let speedKmH = 0;
-    if (typeof pos.coords.speed === "number" && pos.coords.speed > 0) {
-      speedKmH = Math.round(pos.coords.speed * 3.6);
-    } else if (this.lastGpsCoords && this.lastGpsTimestamp > 0) {
-      const dtHours = (now - this.lastGpsTimestamp) / 3600000;
-      if (dtHours > 0.0001 && typeof window.getHaversineDistanceKm === "function") {
-        const dKm = window.getHaversineDistanceKm(this.lastGpsCoords.lat, this.lastGpsCoords.lng, lat, lng);
-        speedKmH = Math.min(120, Math.round(dKm / dtHours));
-      }
-    }
-    this.currentGpsSpeed = speedKmH;
-    this.lastGpsCoords = { lat, lng };
-    this.lastGpsTimestamp = now;
-
-    // Update speedometer displays
-    const speedNum = document.getElementById("gpsSpeedNum");
-    if (speedNum) speedNum.textContent = String(speedKmH);
-
-    const liveSpeedVal = document.getElementById("liveSpeedVal");
-    if (liveSpeedVal) liveSpeedVal.textContent = `${speedKmH} km/h (GPS)`;
-
-    // 2. Compute Corridor Proximity to all 16 Stations
-    if (typeof window.CORRIDOR_STATIONS !== "object" || typeof window.getHaversineDistanceKm !== "function") return;
-
-    const schedule = this.trainData.schedule || [];
-    let closestStation = null;
-    let closestDistKm = 9999;
-
-    schedule.forEach(st => {
-      const coord = window.CORRIDOR_STATIONS[st.code];
-      if (coord) {
-        const d = window.getHaversineDistanceKm(lat, lng, coord.lat, coord.lng);
-        if (d < closestDistKm) {
-          closestDistKm = d;
-          closestStation = st;
-        }
-      }
-    });
-
-    const hudTitle = document.getElementById("gpsHudTitle");
-    const hudSub = document.getElementById("gpsHudSub");
-
-    if (closestStation) {
-      this.closestStation = closestStation;
-      const isAtStation = closestDistKm <= 0.45; // Within 450m of platform
-
-      if (isAtStation) {
-        if (hudTitle) hudTitle.textContent = `🚉 At ${closestStation.name} (${closestStation.nameTa || ""})`;
-        if (hudSub) hudSub.textContent = `Platform ${closestStation.platform || "Main"} · Real-time GPS Locked`;
-      } else {
-        if (hudTitle) hudTitle.textContent = `🚆 Speed: ${speedKmH} km/h · Near ${closestStation.name}`;
-        if (hudSub) hudSub.textContent = `${closestDistKm.toFixed(1)} km from ${closestStation.name} · Next Halt Tracked`;
-      }
-
-      // Check distance to commuter's target alert station (Egmore or Chengalpattu)
-      const targetCode = this.alertTargetMode === "boarding" ? this.boardingStation : this.destStation;
-      const targetCoord = window.CORRIDOR_STATIONS[targetCode];
-      if (targetCoord) {
-        const targetDistKm = window.getHaversineDistanceKm(lat, lng, targetCoord.lat, targetCoord.lng);
-        // If within 10 km and moving towards it, estimate arrival
-        const effSpeed = Math.max(25, speedKmH);
-        const etaMin = Math.round((targetDistKm / effSpeed) * 60);
-
-        // Auto trigger 10-minute alert if in physical range
-        if (etaMin <= 10 && !this.alertTriggered) {
-          this.triggerAlarm();
-        }
-      }
-    }
-  }
-
   updateSyncStatusNotice(text) {
     const noticeEl = document.getElementById("syncNoticeText");
     if (noticeEl) {
@@ -1312,27 +1131,24 @@ class TrainTrackerApp {
     }
   }
 
-  // Open full corridor timetable modal
-  openTimetableModal() {
-    const modal = document.getElementById("timetableModal");
-    if (!modal) return;
-    this.renderTimetable();
-    modal.style.display = "flex";
-  }
-
-  // Render full corridor timetable table
+  // Render full corridor timetable table directly on the page
   renderTimetable() {
     const tbody = document.getElementById("corridorTimetableBody");
-    const titleEl = document.getElementById("timetableModalTitle");
-    const subTitleEl = document.getElementById("timetableModalSubtitle");
+    const titleEl = document.getElementById("inlineTimetableTitle");
+    const subTitleEl = document.getElementById("inlineTimetableSubtitle");
+    const rakeBadge = document.getElementById("timetableRakeBadge");
     if (!tbody || !this.trainData) return;
 
     const isMorning = this.currentTrainId === "49002";
     if (titleEl) {
-      titleEl.textContent = `Train ${this.currentTrainId} · ${isMorning ? 'Chengalpattu ➔ Egmore' : 'Beach ➔ Chengalpattu'}`;
+      titleEl.textContent = `TIMETABLE · TRAIN ${this.currentTrainId} (${isMorning ? 'CGL ➔ MS' : 'MS ➔ CGL'})`;
     }
     if (subTitleEl) {
-      subTitleEl.textContent = `16 Corridor Stations · Delay Offset: ${this.delayMinutes > 0 ? '+' + this.delayMinutes + 'm' : 'On Time'}`;
+      subTitleEl.textContent = `16 Stations · ${isMorning ? 'Morning Office Commute (07:50 AM)' : 'Evening Home Commute (18:17 PM)'} · Delay: ${this.delayMinutes > 0 ? '+' + this.delayMinutes + 'm' : 'On Time'}`;
+    }
+    if (rakeBadge) {
+      rakeBadge.textContent = isMorning ? "🌅 12-Car Medha AC EMU" : "🌆 12-Car Medha AC EMU";
+      rakeBadge.className = isMorning ? "ac-chip chip-morning" : "ac-chip chip-evening";
     }
 
     const currentStatus = this.calculateTrainStatus();
@@ -1484,6 +1300,7 @@ class TrainTrackerApp {
       this.updateClockDisplay();
       this.updateLiveCard(status);
       this.updateCountdownBadge(status);
+      this.renderTimetable();
     } catch(err) {
       console.error("updateUI error:", err);
     }
