@@ -216,31 +216,41 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 4px;
-  background: rgba(15, 23, 42, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 4px 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+  gap: 8px;
+  background: rgba(13, 20, 36, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 6px 8px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), 0 4px 18px rgba(0, 0, 0, 0.3);
   width: 100%;
   box-sizing: border-box;
-  touch-action: none;
 }
 
 .skeuo-label-side {
   flex: 1 1 0;
   min-width: 0;
   background: transparent;
-  border: none;
-  cursor: pointer;
+  border: 1px solid transparent;
+  cursor: pointer !important;
+  pointer-events: auto !important;
   display: flex;
   flex-direction: column;
-  padding: 4px 6px;
+  justify-content: center;
+  padding: 6px 8px;
   border-radius: 12px;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  color: var(--text-dim);
+  color: #64748B;
   font-family: var(--font-sans);
-  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.skeuo-label-side * {
+  pointer-events: none;
+}
+
+.skeuo-label-side:active {
+  transform: scale(0.96);
 }
 
 .skeuo-label-side.left {
@@ -254,167 +264,105 @@ body {
 }
 
 .skeuo-train-code {
-  font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-family: var(--font-sans);
+  font-size: 0.98rem;
   font-weight: 800;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
+  color: #94A3B8;
+  line-height: 1.2;
   white-space: nowrap;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .skeuo-train-desc {
-  font-size: 0.58rem;
+  font-size: 0.65rem;
   font-weight: 600;
+  color: #64748B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
   white-space: nowrap;
-  opacity: 0.85;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
+/* Active Highlight States (Netlify exact) */
 .skeuo-label-side.left.active {
-  color: #F59E0B;
   background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.2);
 }
-
 .skeuo-label-side.left.active .skeuo-train-code {
-  color: #FEF3C7;
-  text-shadow: 0 0 12px rgba(245, 158, 11, 0.85);
+  color: #FBBF24;
+}
+.skeuo-label-side.left.active .skeuo-train-desc {
+  color: #FDE68A;
 }
 
 .skeuo-label-side.right.active {
-  color: var(--accent-cyan);
-  background: rgba(6, 182, 212, 0.14);
+  background: rgba(6, 182, 212, 0.16);
+  border: 1px solid rgba(6, 182, 212, 0.4);
+  box-shadow: 0 0 14px rgba(6, 182, 212, 0.25);
 }
-
 .skeuo-label-side.right.active .skeuo-train-code {
-  color: #ECFEFF;
-  text-shadow: 0 0 12px rgba(6, 182, 212, 0.85);
+  color: #FFFFFF;
+}
+.skeuo-label-side.right.active .skeuo-train-desc {
+  color: #38BDF8;
 }
 
-/* ThreeUI Skeuomorphic Shader WebGL Toggle Switch */
+.target-side-left.active {
+  background: rgba(16, 185, 129, 0.16) !important;
+  border: 1px solid rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.25) !important;
+}
+.target-side-left.active .skeuo-train-code {
+  color: #10B981 !important;
+}
+.target-side-left.active .skeuo-train-desc {
+  color: #6EE7B7 !important;
+}
+
+.target-side-right.active {
+  background: rgba(244, 63, 94, 0.16) !important;
+  border: 1px solid rgba(244, 63, 94, 0.45) !important;
+  box-shadow: 0 0 14px rgba(244, 63, 94, 0.25) !important;
+}
+.target-side-right.active .skeuo-train-code {
+  color: #F43F5E !important;
+}
+.target-side-right.active .skeuo-train-desc {
+  color: #FDA4AF !important;
+}
+
+/* 3D WebGL Shader Capsule (Netlify exact) */
 .shader-toggle {
   position: relative;
-  width: 82px;
-  height: 38px;
-  min-width: 80px;
+  width: 96px !important;
+  height: 44px !important;
+  min-width: 96px !important;
+  max-width: 96px !important;
   border-radius: 9999px;
-  cursor: pointer;
+  cursor: pointer !important;
+  pointer-events: auto !important;
   overflow: hidden;
-  background: linear-gradient(180deg, #050811 0%, #0d1527 100%);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), inset 0 -1px 2px rgba(255, 255, 255, 0.1), 0 2px 10px rgba(0, 0, 0, 0.6);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: #030712;
+  border: 1.5px solid rgba(255, 255, 255, 0.14);
   display: flex;
   align-items: center;
   flex-shrink: 0;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-  touch-action: none;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), inset 0 -1px 2px rgba(255, 255, 255, 0.12), 0 3px 12px rgba(0, 0, 0, 0.5);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .shader-toggle__canvas {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
   display: block;
-  pointer-events: none;
+  pointer-events: none !important;
   z-index: 1;
-}
-
-/* Physical 3D Tactile Sliding Thumb Knob */
-.shader-toggle__thumb {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #475569 0%, #1E293B 65%, #0F172A 100%);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 2px rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-  z-index: 5;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
-}
-
-.shader-toggle__thumb .thumb-core {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #FFFFFF;
-  transition: all 0.35s ease;
-}
-
-.shader-toggle__thumb .thumb-lines {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-/* State OFF (Left) & State ON (Right) */
-.shader-toggle[data-state="off"] .shader-toggle__thumb {
-  transform: translateX(0px);
-}
-
-.shader-toggle[data-state="on"] .shader-toggle__thumb {
-  transform: translateX(46px);
-}
-
-/* Train Colors: Morning Yellow (Left) vs Evening Cyan (Right) */
-.shader-toggle-train[data-state="off"] {
-  border-color: rgba(245, 158, 11, 0.85);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 22px rgba(245, 158, 11, 0.65), 0 0 35px rgba(245, 158, 11, 0.35);
-}
-.shader-toggle-train[data-state="off"] .shader-toggle__thumb {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 16px rgba(245, 158, 11, 0.9);
-}
-.shader-toggle-train[data-state="off"] .thumb-core {
-  background: #F59E0B;
-  box-shadow: 0 0 12px #F59E0B, 0 0 22px #FEF3C7;
-}
-
-.shader-toggle-train[data-state="on"] {
-  border-color: rgba(6, 182, 212, 0.85);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 22px rgba(6, 182, 212, 0.65), 0 0 35px rgba(6, 182, 212, 0.35);
-}
-.shader-toggle-train[data-state="on"] .shader-toggle__thumb {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 16px rgba(6, 182, 212, 0.9);
-}
-.shader-toggle-train[data-state="on"] .thumb-core {
-  background: #06B6D4;
-  box-shadow: 0 0 12px #06B6D4, 0 0 22px #67E8F9;
-}
-
-/* Target Colors: Boarding Mint (Left) vs Deboarding Violet (Right) */
-.shader-toggle-target[data-state="off"] {
-  border-color: rgba(16, 185, 129, 0.85);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 22px rgba(16, 185, 129, 0.65), 0 0 35px rgba(16, 185, 129, 0.35);
-}
-.shader-toggle-target[data-state="off"] .shader-toggle__thumb {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 16px rgba(16, 185, 129, 0.9);
-}
-.shader-toggle-target[data-state="off"] .thumb-core {
-  background: #10B981;
-  box-shadow: 0 0 12px #10B981, 0 0 22px #A7F3D0;
-}
-
-.shader-toggle-target[data-state="on"] {
-  border-color: rgba(239, 68, 68, 0.85);
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 22px rgba(239, 68, 68, 0.65), 0 0 35px rgba(239, 68, 68, 0.35);
-}
-.shader-toggle-target[data-state="on"] .shader-toggle__thumb {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8), 0 0 16px rgba(239, 68, 68, 0.9);
-}
-.shader-toggle-target[data-state="on"] .thumb-core {
-  background: #EF4444;
-  box-shadow: 0 0 12px #EF4444, 0 0 22px #FCA5A5;
 }
 
 .shader-toggle__switch {
@@ -424,16 +372,33 @@ body {
   height: 100%;
   border: 0;
   background: transparent;
-  cursor: pointer;
+  cursor: pointer !important;
   opacity: 0;
-  z-index: 10;
-  pointer-events: none !important;
-  touch-action: none !important;
+  z-index: 20;
+  pointer-events: auto !important;
   -webkit-tap-highlight-color: transparent;
 }
 
+.shader-toggle-train[data-state="off"] {
+  border-color: rgba(245, 158, 11, 0.7);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 16px rgba(245, 158, 11, 0.4);
+}
+.shader-toggle-train[data-state="on"] {
+  border-color: rgba(6, 182, 212, 0.7);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 16px rgba(6, 182, 212, 0.4);
+}
+
+.shader-toggle-target[data-state="off"] {
+  border-color: rgba(16, 185, 129, 0.7);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 16px rgba(16, 185, 129, 0.4);
+}
+.shader-toggle-target[data-state="on"] {
+  border-color: rgba(244, 63, 94, 0.7);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 16px rgba(244, 63, 94, 0.4);
+}
+
 .skeuo-active-train-indicator {
-  font-size: 0.72rem;
+  font-size: 0.70rem;
   color: var(--text-muted);
   text-align: center;
   padding: 2px 4px;

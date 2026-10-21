@@ -1,14 +1,14 @@
-// Service Worker for Chennai AC Local Train Tracker (v21.0 Vercel Live)
+// Service Worker for Chennai AC Local Train Tracker (v22.0 Netlify Buttons Live)
 // Strategy: Network-First with Cache Fallback & Instant Auto-Purge of Old Caches
-const CACHE_NAME = 'cgl-ms-tracker-v21-vercel';
+const CACHE_NAME = 'cgl-ms-tracker-v22-buttons';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=21.0',
-  './threeui-engine.js?v=21.0',
-  './app.js?v=21.0',
-  './data/trains.js?v=21.0',
-  './audio/chime.js?v=21.0',
+  './styles.css?v=22.0',
+  './threeui-engine.js?v=22.0',
+  './app.js?v=22.0',
+  './data/trains.js?v=22.0',
+  './audio/chime.js?v=22.0',
   './icon.jpg',
   './manifest.json'
 ];

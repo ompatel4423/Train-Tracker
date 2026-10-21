@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=21.0">
+  <link rel="stylesheet" href="styles.css?v=22.0">
 </head>
 <body>
 
@@ -49,34 +49,27 @@
         </div>
       </div>
 
-      <!-- ThreeUI SkeuomorphicToggleCollection (variant="shader", mode="auto", speed=1.0) -->
+      <!-- 1. Train Switcher (Morning 49002 ⇄ Evening 49007) -->
       <div class="train-switch-container">
         <div class="skeuo-toggle-wrapper">
-          <!-- Left: Morning 49002 (Golden Sunrise Yellow) -->
-          <button class="skeuo-label-side left" data-train="49002" type="button" aria-label="Select Morning Train 49002 to Office">
-            <span class="skeuo-train-code">🌅 49002</span>
-            <span class="skeuo-train-desc">Office (07:50)</span>
+          <button class="skeuo-label-side left" data-train="49002" id="trainBtn49002" type="button" aria-label="Select Morning Train 49002">
+            <span class="skeuo-train-code">49002</span>
+            <span class="skeuo-train-desc">🌅 07:50 · Morn</span>
           </button>
 
-          <!-- 3D WebGL Shader Toggle with Tactile Sliding Thumb -->
-          <div id="skeuoTrainToggle" class="shader-toggle shader-toggle-train" data-mode="dark" data-state="on" title="Slide to toggle between Morning Office Commute (49002) and Evening Home Commute (49007)">
-            <canvas class="shader-toggle__canvas" id="shaderToggleCanvas"></canvas>
-            <div class="shader-toggle__thumb" id="skeuoTrainThumb">
-              <div class="thumb-core"></div>
-              <div class="thumb-lines"></div>
-            </div>
-            <button type="button" class="shader-toggle__switch" role="switch" aria-checked="true" aria-label="Switch between Morning Train 49002 to Office and Evening Train 49007 to Home"></button>
+          <div id="skeuoTrainToggle" class="shader-toggle shader-toggle-train" data-mode="dark" data-state="on" title="Tap to toggle Train 49002 & 49007">
+            <canvas class="shader-toggle__canvas" id="shaderToggleCanvas" width="208" height="96"></canvas>
+            <button type="button" class="shader-toggle__switch" role="switch" aria-checked="true" aria-label="Toggle Train 49002 and 49007"></button>
           </div>
 
-          <!-- Right: Evening 49007 (Electric Cyan) -->
-          <button class="skeuo-label-side right active" data-train="49007" type="button" aria-label="Select Evening Train 49007 to Home">
-            <span class="skeuo-train-code">🌆 49007</span>
-            <span class="skeuo-train-desc">Home (18:17)</span>
+          <button class="skeuo-label-side right active" data-train="49007" id="trainBtn49007" type="button" aria-label="Select Evening Train 49007">
+            <span class="skeuo-train-code">49007</span>
+            <span class="skeuo-train-desc">🌆 18:17 · Eve</span>
           </button>
         </div>
 
         <div class="skeuo-active-train-indicator" id="skeuoActiveTrainDesc">
-          🌆 Active: <strong>Train 49007 AC Local</strong> · Evening (Chennai Egmore ➔ Chengalpattu · 18:17)
+          🌆 Active: <strong>Train 49007 AC Local</strong> · Evening (Chennai Egmore ➔ Chengalpattu · 18:17 PM)
         </div>
       </div>
     </header>
@@ -139,25 +132,18 @@
         <!-- Smart Switch for Boarding vs Deboarding Arrival -->
         <div class="target-switch-container">
           <div class="skeuo-toggle-wrapper target-toggle-wrapper">
-            <!-- Left: Boarding Arrival (Emerald Mint Green) -->
-            <button id="targetModeBoardBtn" class="skeuo-label-side left target-side-left active" type="button" aria-label="Show Time until Boarding">
-              <span class="skeuo-train-code">🎫 BOARDING</span>
+            <button id="targetModeBoardBtn" class="skeuo-label-side left target-side-left active" type="button" aria-label="Alert for Boarding">
+              <span class="skeuo-train-code">BOARDING</span>
               <span class="skeuo-train-desc" id="boardStationLabel">Egmore (MS)</span>
             </button>
 
-            <!-- 3D WebGL Shader Toggle with Tactile Sliding Thumb (Emerald Mint ↔ Violet Magenta) -->
-            <div id="skeuoTargetToggle" class="shader-toggle shader-toggle-target" data-mode="dark" data-state="off" title="Slide to toggle between Boarding and Deboarding Arrival">
-              <canvas class="shader-toggle__canvas" id="shaderTargetCanvas"></canvas>
-              <div class="shader-toggle__thumb" id="skeuoTargetThumb">
-                <div class="thumb-core"></div>
-                <div class="thumb-lines"></div>
-              </div>
-              <button type="button" class="shader-toggle__switch" role="switch" aria-checked="false" aria-label="Toggle between Time until Boarding and Time until Deboarding"></button>
+            <div id="skeuoTargetToggle" class="shader-toggle shader-toggle-target" data-mode="dark" data-state="off" title="Toggle Boarding vs Deboarding">
+              <canvas class="shader-toggle__canvas" id="shaderTargetCanvas" width="208" height="96"></canvas>
+              <button type="button" class="shader-toggle__switch" role="switch" aria-checked="false" aria-label="Toggle Boarding and Deboarding alert"></button>
             </div>
 
-            <!-- Right: Deboarding Arrival (Electric Crimson Red) -->
-            <button id="targetModeDeboardBtn" class="skeuo-label-side right target-side-right" type="button" aria-label="Show Time until Deboarding">
-              <span class="skeuo-train-code">🏁 DEBOARDING</span>
+            <button id="targetModeDeboardBtn" class="skeuo-label-side right target-side-right" type="button" aria-label="Alert for Deboarding">
+              <span class="skeuo-train-code">DEBOARDING</span>
               <span class="skeuo-train-desc" id="deboardStationLabel">Chengalpattu (CGL)</span>
             </button>
           </div>
@@ -345,18 +331,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v21.0) -->
-  <script src="data/trains.js?v=21.0"></script>
-  <script src="audio/chime.js?v=21.0"></script>
-  <script src="threeui-engine.js?v=21.0"></script>
-  <script src="app.js?v=21.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v22.0) -->
+  <script src="data/trains.js?v=22.0"></script>
+  <script src="audio/chime.js?v=22.0"></script>
+  <script src="threeui-engine.js?v=22.0"></script>
+  <script src="app.js?v=22.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=21.0')
+        navigator.serviceWorker.register('sw.js?v=22.0')
           .then(reg => {
-            console.log('Service Worker v21.0 active', reg);
+            console.log('Service Worker v22.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;
