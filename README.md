@@ -115,38 +115,10 @@ cd Train-Tracker
 
 # Start the native local server
 npm start
-# or: node server.js
+# or: node dev-server.js
 
 # Open in browser
 open http://localhost:3000
-```
-
----
-
-## 🌐 Serverless API Route (`/api/status`)
-
-This repository includes a native Vercel Edge Serverless Function located at [`/api/status.js`](api/status.js):
-
-- **Endpoint:** `GET /api/status?train=49007`
-- **Response:**
-```json
-{
-  "status": "ok",
-  "service": "Chennai AC Local Commuter Assistant",
-  "train": {
-    "trainNo": "49007",
-    "name": "Chennai Beach - Chengalpattu AC EMU Fast",
-    "route": "MS -> CGL",
-    "direction": "down",
-    "depTime": "18:27",
-    "arrTime": "19:50",
-    "primaryPlatformOrigin": "10",
-    "primaryPlatformDest": "5"
-  },
-  "timestamp": "2026-10-21T14:50:00.000Z",
-  "deployment": "Vercel Serverless Edge",
-  "version": "2.0.0"
-}
 ```
 
 ---

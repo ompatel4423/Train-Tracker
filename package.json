@@ -1,25 +1,16 @@
 {
-  "name": "chennai-ac-train-tracker",
+  "name": "train-tracker",
   "version": "2.0.0",
+  "private": true,
   "description": "Personal AC Local Train Tracker & Platform Arrival Reminder for Southern Railway Chennai suburban commuters",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "build": "echo 'Static PWA ready for Vercel deployment'"
+    "start": "node dev-server.js",
+    "dev": "node dev-server.js"
   },
   "keywords": [
     "train-tracker",
     "chennai-suburban",
-    "chennai-egmore",
-    "chengalpattu",
-    "pwa",
-    "vercel",
-    "railway-alert"
+    "pwa"
   ],
-  "author": "ompatel4423",
-  "license": "MIT",
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "author": "ompatel4423"
 }
