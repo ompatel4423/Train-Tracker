@@ -362,31 +362,48 @@ const TRAIN_DATABASE = {
   }
 };
 
-// All key stations along the corridor with coordinate offsets for map & distances
+// All key stations along the corridor with coordinate offsets for live GPS & distances
 const CORRIDOR_STATIONS = {
-  MSB: { name: "Chennai Beach", code: "MSB", lat: 13.0924, lng: 80.2934 },
-  MSF: { name: "Chennai Fort", code: "MSF", lat: 13.0805, lng: 80.2829 },
-  MPK: { name: "Chennai Park", code: "MPK", lat: 13.0818, lng: 80.2737 },
-  MS: { name: "Chennai Egmore", code: "MS", lat: 13.0792, lng: 80.2608 },
-  MBM: { name: "Mambalam", code: "MBM", lat: 13.0336, lng: 80.2289 },
-  GDY: { name: "Guindy", code: "GDY", lat: 13.0076, lng: 80.2131 },
-  STM: { name: "St. Thomas Mount", code: "STM", lat: 12.9942, lng: 80.1983 },
-  CMP: { name: "Chromepet", code: "CMP", lat: 12.9515, lng: 80.1412 },
-  TBM: { name: "Tambaram", code: "TBM", lat: 12.9249, lng: 80.1205 },
-  PRGL: { name: "Perungalathur", code: "PRGL", lat: 12.9038, lng: 80.0911 },
-  UPM: { name: "Urappakkam", code: "UPM", lat: 12.8687, lng: 80.0712 },
-  GI: { name: "Guduvancheri", code: "GI", lat: 12.8456, lng: 80.0579 },
-  POTI: { name: "Potheri", code: "POTI", lat: 12.8227, lng: 80.0385 },
-  SKL: { name: "Singaperumal Koil", code: "SKL", lat: 12.7634, lng: 79.9934 },
-  PWU: { name: "Paranur", code: "PWU", lat: 12.7229, lng: 79.9876 },
-  CGL: { name: "Chengalpattu Jn", code: "CGL", lat: 12.6841, lng: 79.9836 }
+  MSB:  { name: "Chennai Beach", nameTa: "சென்னை கடற்கரை", code: "MSB", lat: 13.0989, lng: 80.2925 },
+  MSF:  { name: "Chennai Fort", nameTa: "சென்னை கோட்டை", code: "MSF", lat: 13.0881, lng: 80.2831 },
+  MPK:  { name: "Chennai Park", nameTa: "பூங்கா", code: "MPK", lat: 13.0818, lng: 80.2747 },
+  MS:   { name: "Chennai Egmore", nameTa: "சென்னை எழும்பூர்", code: "MS", lat: 13.0827, lng: 80.2606 },
+  MBM:  { name: "Mambalam", nameTa: "மாம்பலம்", code: "MBM", lat: 13.0336, lng: 80.2289 },
+  GDY:  { name: "Guindy", nameTa: "கிண்டி", code: "GDY", lat: 13.0078, lng: 80.2131 },
+  STM:  { name: "St. Thomas Mount", nameTa: "புனித தோமையார் மலை", code: "STM", lat: 12.9942, lng: 80.1983 },
+  CMP:  { name: "Chromepet", nameTa: "குரோம்பேட்டை", code: "CMP", lat: 12.9517, lng: 80.1417 },
+  TBM:  { name: "Tambaram", nameTa: "தாம்பரம்", code: "TBM", lat: 12.9256, lng: 80.1172 },
+  PRGL: { name: "Perungalathur", nameTa: "பெருங்களத்தூர்", code: "PRGL", lat: 12.9097, lng: 80.0961 },
+  VDR:  { name: "Vandalur", nameTa: "வண்டலூர்", code: "VDR", lat: 12.8911, lng: 80.0811 },
+  UPM:  { name: "Urappakkam", nameTa: "ஊரப்பாக்கம்", code: "UPM", lat: 12.8681, lng: 80.0717 },
+  GI:   { name: "Guduvancheri", nameTa: "கூடுவாஞ்சேரி", code: "GI", lat: 12.8464, lng: 80.0617 },
+  POTI: { name: "Potheri", nameTa: "பொத்தேரி", code: "POTI", lat: 12.8258, lng: 80.0519 },
+  CTM:  { name: "Kattangulattur", nameTa: "காட்டாங்கொளத்தூர்", code: "CTM", lat: 12.8167, lng: 80.0489 },
+  MMNK: { name: "Maraimalai Nagar", nameTa: "மறைமலை நகர்", code: "MMNK", lat: 12.7972, lng: 80.0416 },
+  SKL:  { name: "Singaperumal Koil", nameTa: "சிங்கபெருமாள்கோவில்", code: "SKL", lat: 12.7667, lng: 80.0247 },
+  PWU:  { name: "Paranur", nameTa: "பரனூர்", code: "PWU", lat: 12.7297, lng: 80.0031 },
+  CGL:  { name: "Chengalpattu Jn", nameTa: "செங்கல்பட்டு சந்திப்பு", code: "CGL", lat: 12.6937, lng: 79.9757 }
 };
+
+// Great-circle Haversine distance calculator between GPS coordinates
+function getHaversineDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's mean radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 if (typeof window !== "undefined") {
   window.TRAIN_DATABASE = TRAIN_DATABASE;
   window.CORRIDOR_STATIONS = CORRIDOR_STATIONS;
+  window.getHaversineDistanceKm = getHaversineDistanceKm;
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { TRAIN_DATABASE, CORRIDOR_STATIONS };
+  module.exports = { TRAIN_DATABASE, CORRIDOR_STATIONS, getHaversineDistanceKm };
 }
