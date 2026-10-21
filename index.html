@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#090D16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Personal AC Local Train Tracker & Platform Arrival Reminder for Chengalpattu to Chennai Egmore daily commuters">
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  
+  <title>Chennai AC Local Commuter | CGL ⇄ MS Tracker</title>
+  
+  <link rel="icon" type="image/jpeg" href="icon.jpg">
+  <link rel="apple-touch-icon" href="icon.jpg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css?v=21.0">
+</head>
+<body>
+
+  <!-- ThreeUI PortalField (variant="flow-field") Interactive Background Canvas -->
+  <canvas id="threeuiFlowCanvas" class="threeui-flow-bg"></canvas>
+
+  <div class="app-wrapper shader-frame">
+    <!-- Dynamic Island Spacer for iPhone 15 Pro -->
+    <div class="dynamic-island-spacer" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-top-row">
+        <!-- ThreeUI GalleryHeading (variant="rising-diagonal", mode="dark", font="sans") -->
+        <div class="gallery-heading-rising-diagonal brand-badge" data-mode="dark">
+          <img src="icon.jpg" alt="AC Local Icon" class="app-logo">
+          <div class="gallery-heading-content">
+            <h1 class="gallery-headline">
+              <span class="gallery-text-main" id="brandHeadlineRoute">MS ➔ CGL</span>
+              <span class="ac-chip chip-evening" id="brandAcChip">🌆 EVENING AC</span>
+            </h1>
+            <span class="gallery-subheadline" id="brandSubheadline">CHENNAI EGMORE ➔ CHENGALPATTU (DOWN FAST)</span>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="wakeLockBtn" class="icon-btn" title="Keep screen awake while commuting">💡</button>
+          <button id="apiSettingsBtn" class="icon-btn" title="Data Source & Live API Settings">⚙️</button>
+        </div>
+      </div>
+
+      <!-- ThreeUI SkeuomorphicToggleCollection (variant="shader", mode="auto", speed=1.0) -->
+      <div class="train-switch-container">
+        <div class="skeuo-toggle-wrapper">
+          <!-- Left: Morning 49002 (Golden Sunrise Yellow) -->
+          <button class="skeuo-label-side left" data-train="49002" type="button" aria-label="Select Morning Train 49002">
+            <span class="skeuo-train-code">🌅 49002</span>
+            <span class="skeuo-train-desc">Morning (07:50)</span>
+          </button>
+
+          <!-- 3D WebGL Shader Toggle with Tactile Sliding Thumb -->
+          <div id="skeuoTrainToggle" class="shader-toggle shader-toggle-train" data-mode="dark" data-state="on" title="Slide to toggle between Morning (49002) and Evening (49007)">
+            <canvas class="shader-toggle__canvas" id="shaderToggleCanvas"></canvas>
+            <div class="shader-toggle__thumb" id="skeuoTrainThumb">
+              <div class="thumb-core"></div>
+              <div class="thumb-lines"></div>
+            </div>
+            <button type="button" class="shader-toggle__switch" role="switch" aria-checked="true" aria-label="Switch between Train 49002 Morning and 49007 Evening"></button>
+          </div>
+
+          <!-- Right: Evening 49007 (Electric Cyan) -->
+          <button class="skeuo-label-side right active" data-train="49007" type="button" aria-label="Select Evening Train 49007">
+            <span class="skeuo-train-code">🌆 49007</span>
+            <span class="skeuo-train-desc">Evening (18:17)</span>
+          </button>
+        </div>
+
+        <div class="skeuo-active-train-indicator" id="skeuoActiveTrainDesc">
+          🌆 Active: <strong>Train 49007 AC Local</strong> · Evening (Chennai Egmore ➔ Chengalpattu · 18:17)
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Live Train Status Card (The Commuter HUD) -->
+      <section class="hero-status-card">
+        <div class="status-header-row">
+          <div id="liveStatusBadge" class="status-badge active">
+            <span class="pulse-dot"></span> <span id="liveStatusBadgeText">Moving · Live</span>
+          </div>
+
+          <!-- Official Live Schedule Indicator -->
+          <div class="live-timetable-pill" title="Live Southern Railway Timetable Tracking">
+            <span class="radar-dot"></span> <span id="syncModeText">⏱ Live Schedule Active</span>
+          </div>
+
+          <div class="clock-display">
+            <span>🕒</span>
+            <span id="liveClock">--:--:--</span>
+          </div>
+        </div>
+
+        <div class="live-position-headline">
+          <h2 id="liveStatusTitle">Tracking Train <span id="trainNumHighlight" class="train-num-pill train-num-evening">49007</span> AC Local</h2>
+          <p id="liveStatusSubtitle">Chennai Egmore ➔ Chengalpattu Suburban Line</p>
+        </div>
+
+        <!-- Animated Railway Line Progress -->
+        <div class="track-progress-container">
+          <div class="track-line-bg">
+            <div id="trainProgressBar" class="track-line-fill track-evening"></div>
+          </div>
+          <div id="trainIconMarker" class="train-marker" title="Live Train Location">🚆</div>
+        </div>
+
+        <!-- Route Endpoint Indicators -->
+        <div class="track-endpoints-row">
+          <div class="track-endpoint left" id="trackOriginLabel">
+            <span class="endpoint-code" id="trackOriginCode">MS</span>
+            <span class="endpoint-name" id="trackOriginName">Egmore (18:27)</span>
+          </div>
+          <div class="track-route-arrow" id="trackRouteArrow">➔</div>
+          <div class="track-endpoint right" id="trackDestLabel">
+            <span class="endpoint-code" id="trackDestCode">CGL</span>
+            <span class="endpoint-name" id="trackDestName">Chengalpattu (19:50)</span>
+          </div>
+        </div>
+
+        <div class="telemetry-row">
+          <span class="telemetry-item">Speed: <strong id="liveSpeedVal">0 km/h</strong></span>
+          <span class="telemetry-item"><span id="trainHeaderName">49007 AC EMU Fast</span></span>
+        </div>
+      </section>
+
+      <!-- Spotlight: Target Station, Countdown & Platform with Smart Switch -->
+      <section class="target-spotlight-card">
+        <!-- Smart Switch for Boarding vs Deboarding Arrival -->
+        <div class="target-switch-container">
+          <div class="skeuo-toggle-wrapper target-toggle-wrapper">
+            <!-- Left: Boarding Arrival (Emerald Mint Green) -->
+            <button id="targetModeBoardBtn" class="skeuo-label-side left target-side-left active" type="button" aria-label="Show Time until Boarding">
+              <span class="skeuo-train-code">🎫 BOARDING</span>
+              <span class="skeuo-train-desc" id="boardStationLabel">Egmore (MS)</span>
+            </button>
+
+            <!-- 3D WebGL Shader Toggle with Tactile Sliding Thumb (Emerald Mint ↔ Violet Magenta) -->
+            <div id="skeuoTargetToggle" class="shader-toggle shader-toggle-target" data-mode="dark" data-state="off" title="Slide to toggle between Boarding and Deboarding Arrival">
+              <canvas class="shader-toggle__canvas" id="shaderTargetCanvas"></canvas>
+              <div class="shader-toggle__thumb" id="skeuoTargetThumb">
+                <div class="thumb-core"></div>
+                <div class="thumb-lines"></div>
+              </div>
+              <button type="button" class="shader-toggle__switch" role="switch" aria-checked="false" aria-label="Toggle between Time until Boarding and Time until Deboarding"></button>
+            </div>
+
+            <!-- Right: Deboarding Arrival (Electric Crimson Red) -->
+            <button id="targetModeDeboardBtn" class="skeuo-label-side right target-side-right" type="button" aria-label="Show Time until Deboarding">
+              <span class="skeuo-train-code">🏁 DEBOARDING</span>
+              <span class="skeuo-train-desc" id="deboardStationLabel">Chengalpattu (CGL)</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="target-display-row">
+          <div class="target-info-col">
+            <span class="target-eyebrow" id="targetDescriptionDisplay">Time until train arrives for boarding</span>
+            <div class="target-station-name" id="targetStationNameDisplay">Chennai Egmore (MS)</div>
+            <div class="target-countdown" id="targetCountdownDisplay">--h --m --s</div>
+            <script>
+              (function() {
+                try {
+                  var cd = document.getElementById('targetCountdownDisplay');
+                  if (!cd) return;
+                  var now = new Date();
+                  var target = new Date(now);
+                  target.setHours(18, 27, 0, 0);
+                  if (now.getTime() > target.getTime()) {
+                    target.setDate(target.getDate() + 1);
+                  }
+                  var diff = target.getTime() - now.getTime();
+                  var secs = Math.floor((diff / 1000) % 60);
+                  var mins = Math.floor((diff / (1000 * 60)) % 60);
+                  var hrs = Math.floor(diff / (1000 * 60 * 60));
+                  cd.textContent = (hrs < 10 ? '0' + hrs : hrs) + 'h ' + (mins < 10 ? '0' + mins : mins) + 'm ' + (secs < 10 ? '0' + secs : secs) + 's';
+                } catch(e) {}
+              })();
+            </script>
+            <div class="countdown-human-badge board-mode" id="countdownHumanBadge">🚆 Arrives at Chennai Egmore at 18:27 (Platform 10)</div>
+            <div class="auto-sync-status-line" id="liveSyncNotice">
+              <span class="sync-dot"></span> <span id="syncNoticeText">Southern Railway Live Timetable Synced</span>
+            </div>
+          </div>
+
+          <div class="platform-spotlight-box">
+            <div class="platform-bubble" id="platformBubbleBox">
+              <div class="pf-label">Platform</div>
+              <div class="pf-number" id="targetPlatformDisplay">10</div>
+            </div>
+            <button id="editPlatformBtn" class="edit-pf-btn">Change PF</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Delay Adjustment Strip -->
+      <div class="delay-control-strip">
+        <span class="delay-label">Reported Delay:</span>
+        <div class="delay-chips-row">
+          <button class="delay-chip active" data-delay="0">On Time</button>
+          <button class="delay-chip" data-delay="5">+5m</button>
+          <button class="delay-chip" data-delay="10">+10m</button>
+          <button class="delay-chip" data-delay="15">+15m</button>
+          <button class="delay-chip" data-delay="30">+30m</button>
+        </div>
+      </div>
+
+      <!-- Commuter Action Toolbar -->
+      <section class="commuter-toolbar">
+        <button id="viewTimetableBtn" class="toolbar-btn" type="button" title="View Full 16-Station Corridor Schedule">
+          <span class="btn-icon">📋</span>
+          <span class="btn-label">Corridor Timetable</span>
+        </button>
+        <button id="testAlarmBtn" class="toolbar-btn" type="button" title="Test Railway Chime & Voice PA Alert">
+          <span class="btn-icon">🔔</span>
+          <span class="btn-label">Test 10m Alarm</span>
+        </button>
+        <button id="installAppBtn" class="toolbar-btn pwa-btn hidden" type="button" title="Install App to Home Screen">
+          <span class="btn-icon">📲</span>
+          <span class="btn-label">Install App</span>
+        </button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- URGENT 10-MINUTE ARRIVAL REMINDER MODAL -->
+  <div id="alertBannerModal" class="modal-backdrop">
+    <div class="modal-content alert-urgent-modal">
+      <div style="font-size: 2.2rem;">🚨</div>
+      <h2 id="alertModalTitle">Train Arriving in 10 Minutes!</h2>
+      
+      <div class="alert-urgent-platform">
+        <div class="pf-big-label">Target Platform Number</div>
+        <div class="pf-big-val" id="alertModalPlatform">10</div>
+      </div>
+
+      <p id="alertModalText" style="color: #F8FAFC; font-size: 0.9rem; line-height: 1.4;">
+        Train 49007 AC Local will reach Chennai Egmore in 10 minutes. Please proceed to the platform!
+      </p>
+
+      <div class="modal-actions" style="justify-content: center; width: 100%; gap: 12px; margin-top: 10px;">
+        <button id="alertSnoozeBtn" class="btn-secondary" style="flex: 1;">Snooze 3m</button>
+        <button id="alertDismissBtn" class="btn-primary" style="flex: 1; background: var(--accent-rose); color: #fff;">I'm Here / Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLATFORM OVERRIDE MODAL -->
+  <div id="platformModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="platformModalStationName">Edit Platform</h3>
+        <button class="close-btn close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>If Southern Railway announcer or station display shows a different platform, override it below:</p>
+        <input type="text" id="platformNumberInput" placeholder="e.g. 10, 9, 4">
+      </div>
+      <div class="modal-actions">
+        <button id="resetPlatformBtn" class="btn-secondary">Reset to Default</button>
+        <button id="savePlatformBtn" class="btn-primary">Save Platform</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CORRIDOR TIMETABLE MODAL -->
+  <div id="timetableModal" class="modal-backdrop">
+    <div class="modal-content modal-large">
+      <div class="modal-header">
+        <div>
+          <h3 id="timetableModalTitle">Corridor Timetable</h3>
+          <p class="modal-subtitle" id="timetableModalSubtitle">All 16 Stations · Southern Railway Schedule & Platforms</p>
+        </div>
+        <button class="close-btn close-modal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body timetable-modal-body">
+        <div class="timetable-table-container">
+          <table class="timetable-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Station</th>
+                <th>Arr</th>
+                <th>Dep</th>
+                <th>PF</th>
+                <th>Dist</th>
+              </tr>
+            </thead>
+            <tbody id="corridorTimetableBody">
+              <!-- Populated dynamically by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary close-modal" style="width: 100%;">Close Timetable</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATA SOURCE & API MODAL -->
+  <div id="apiSettingsModal" class="modal-backdrop">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Train Data & Live API</h3>
+        <button class="close-btn close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><strong>🤖 100% Automatic Live Sync:</strong></p>
+        <p style="font-size: 0.78rem; line-height: 1.45; color: var(--text-muted);">
+          To automatically fetch real-time delays and platform numbers without manual input, the app connects to the <strong>Indian Railway Live Status API</strong> on RapidAPI.<br><br>
+          • <strong>API Name:</strong> <code>IRCTC Indian Railway API</code> (by ashutosh-tiwari)<br>
+          • <strong>Website:</strong> <a href="https://rapidapi.com/ashutosh.tiwari.official/api/irctc1" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">rapidapi.com/api/irctc1</a> (Free tier: 500 calls/mo)<br>
+          • <strong>What it does automatically:</strong> Polls in the background every 60s, auto-detects delays, pushes countdown times, and switches platform numbers if updated.
+        </p>
+
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: 6px;">
+          Your RapidAPI Key (Free)
+        </label>
+        <input type="text" id="rapidApiKeyInput" placeholder="Paste your RapidAPI Key here">
+        
+        <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-top: 6px;">
+          Alert Voice Language
+        </label>
+        <select id="langSelect" class="styled-select">
+          <option value="en">English (Indian Accent)</option>
+          <option value="ta">தமிழ் (Tamil)</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary close-modal">Cancel</button>
+        <button id="saveApiBtn" class="btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts with cache busting to guarantee immediate live updates (v21.0) -->
+  <script src="data/trains.js?v=21.0"></script>
+  <script src="audio/chime.js?v=21.0"></script>
+  <script src="threeui-engine.js?v=21.0"></script>
+  <script src="app.js?v=21.0"></script>
+  <script>
+    // Automatic Service Worker registration with instant background update
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js?v=21.0')
+          .then(reg => {
+            console.log('Service Worker v21.0 active', reg);
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              const worker = reg.installing;
+              if (worker) {
+                worker.addEventListener('statechange', () => {
+                  if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+          })
+          .catch(err => console.log('Service Worker registration failed', err));
+      });
+    }
+  </script>
+</body>
+</html>
