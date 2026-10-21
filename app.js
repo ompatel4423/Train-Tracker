@@ -286,9 +286,9 @@ class TrainTrackerApp {
     const descEl = document.getElementById("skeuoActiveTrainDesc");
     if (descEl) {
       if (trainId === "49007") {
-        descEl.innerHTML = `🌆 Active: <strong>Train 49007 AC Local</strong> · Evening (Chennai Egmore ➔ Chengalpattu · 18:17)`;
+        descEl.innerHTML = `🌆 Active: <strong style="color: #06B6D4;">Evening Return Commute</strong> · Train 49007 AC Fast (Chennai Egmore ➔ Chengalpattu · 18:27 PM)`;
       } else {
-        descEl.innerHTML = `🌅 Active: <strong>Train 49002 AC Local</strong> · Morning (Chengalpattu ➔ Chennai Egmore · 07:50)`;
+        descEl.innerHTML = `🌅 Active: <strong style="color: #F59E0B;">Morning Office Commute</strong> · Train 49002 AC Fast (Chengalpattu ➔ Chennai Egmore · 07:50 AM)`;
       }
     }
 
@@ -1169,24 +1169,24 @@ class TrainTrackerApp {
 
     const brandChip = document.getElementById("brandAcChip");
     if (brandChip) {
-      brandChip.textContent = isMorning ? "🌅 MORNING AC 49002" : "🌆 EVENING AC 49007";
+      brandChip.textContent = isMorning ? "🌅 OFFICE COMMUTE (49002)" : "🌆 HOME COMMUTE (49007)";
       brandChip.className = isMorning ? "ac-chip chip-morning" : "ac-chip chip-evening";
     }
 
     const brandSub = document.getElementById("brandSubheadline");
     if (brandSub) {
       brandSub.textContent = isMorning 
-        ? "CHENGALPATTU ➔ CHENNAI EGMORE (UP FAST · 49002)" 
-        : "CHENNAI EGMORE ➔ CHENGALPATTU (DOWN FAST · 49007)";
+        ? "HOME ➔ OFFICE · CHENGALPATTU ➔ EGMORE (UP FAST · 49002)" 
+        : "OFFICE ➔ HOME · EGMORE ➔ CHENGALPATTU (DOWN FAST · 49007)";
     }
 
     // 2. Active Train Descriptor
     const descEl = document.getElementById("skeuoActiveTrainDesc");
     if (descEl) {
       if (isMorning) {
-        descEl.innerHTML = `🌅 Active: <strong style="color: #F59E0B;">Train 49002 AC Local</strong> · Morning (Chengalpattu ➔ Chennai Egmore · 07:50 AM)`;
+        descEl.innerHTML = `🌅 Active: <strong style="color: #F59E0B;">Morning Office Commute</strong> · Train 49002 AC Fast (Chengalpattu ➔ Chennai Egmore · 07:50 AM)`;
       } else {
-        descEl.innerHTML = `🌆 Active: <strong style="color: #06B6D4;">Train 49007 AC Local</strong> · Evening (Chennai Egmore ➔ Chengalpattu · 18:17 PM)`;
+        descEl.innerHTML = `🌆 Active: <strong style="color: #06B6D4;">Evening Return Commute</strong> · Train 49007 AC Fast (Chennai Egmore ➔ Chengalpattu · 18:27 PM)`;
       }
     }
 
