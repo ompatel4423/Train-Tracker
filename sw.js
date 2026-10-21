@@ -1,14 +1,14 @@
-// Service Worker for Chennai AC Local Train Tracker (v24.0 Live GPS & Serverless NTES Live)
+// Service Worker for Chennai AC Local Train Tracker (v25.0 Pre-Configured Live NTES)
 // Strategy: Network-First with Cache Fallback & Instant Auto-Purge of Old Caches
-const CACHE_NAME = 'cgl-ms-tracker-v24-gps-live';
+const CACHE_NAME = 'cgl-ms-tracker-v25-rapidapi-key';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=24.0',
-  './threeui-engine.js?v=24.0',
-  './app.js?v=24.0',
-  './data/trains.js?v=24.0',
-  './audio/chime.js?v=24.0',
+  './styles.css?v=25.0',
+  './threeui-engine.js?v=25.0',
+  './app.js?v=25.0',
+  './data/trains.js?v=25.0',
+  './audio/chime.js?v=25.0',
   './icon.jpg',
   './manifest.json'
 ];

@@ -25,7 +25,7 @@ export default async function handler(request) {
 
     // Attempt 0: If RAPIDAPI_KEY is configured in Vercel Environment Variables or passed via query,
     // query the official IRCTC / NTES live train status endpoint directly!
-    const rapidApiKey = process.env.RAPIDAPI_KEY || searchParams.get('key');
+    const rapidApiKey = process.env.RAPIDAPI_KEY || searchParams.get('key') || '9cf793d27dmsh7096fd3c254cbfep1eff33jsne6dff7d34ec2';
     if (rapidApiKey) {
       try {
         const rapidUrl = `https://irctc1.p.rapidapi.com/api/v1/liveTrainStatus?trainNo=${trainNo}&startDay=1`;

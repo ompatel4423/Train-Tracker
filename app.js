@@ -42,7 +42,7 @@ class TrainTrackerApp {
     // API Configuration
     this.apiConfig = JSON.parse(localStorage.getItem("railway_api_config") || JSON.stringify({
       provider: "rapidapi",
-      rapidApiKey: "",
+      rapidApiKey: "9cf793d27dmsh7096fd3c254cbfep1eff33jsne6dff7d34ec2",
       customEndpoint: ""
     }));
 

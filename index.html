@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=24.0">
+  <link rel="stylesheet" href="styles.css?v=25.0">
 </head>
 <body>
 
@@ -348,18 +348,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v24.0) -->
-  <script src="data/trains.js?v=24.0"></script>
-  <script src="audio/chime.js?v=24.0"></script>
-  <script src="threeui-engine.js?v=24.0"></script>
-  <script src="app.js?v=24.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v25.0) -->
+  <script src="data/trains.js?v=25.0"></script>
+  <script src="audio/chime.js?v=25.0"></script>
+  <script src="threeui-engine.js?v=25.0"></script>
+  <script src="app.js?v=25.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=24.0')
+        navigator.serviceWorker.register('sw.js?v=25.0')
           .then(reg => {
-            console.log('Service Worker v24.0 active', reg);
+            console.log('Service Worker v25.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;
