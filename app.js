@@ -29,10 +29,9 @@ class TrainTrackerApp {
     this.alertMinutesThreshold = 10;
     this.alertLanguage = "en";
 
-    // Delay & Platform Tracking
+    // Delay & Platform Tracking (Automated Live Sync)
     this.delayMinutes = 0;          // Active delay in minutes
-    this.isManualDelayOverride = false; // True if user manually clicked a delay chip
-    this.platformOverrides = JSON.parse(localStorage.getItem("platform_overrides") || "{}");
+    this.livePlatforms = {};        // Automated platforms from Southern Railway / IRCTC
     this.alertTriggered = false;
     this.wakeLock = null;
 
@@ -201,36 +200,7 @@ class TrainTrackerApp {
       });
     }
 
-    // 4. Delay adjustment chips (Manual commuter report override)
-    document.querySelectorAll(".delay-chip").forEach(chip => {
-      chip.addEventListener("click", (e) => {
-        document.querySelectorAll(".delay-chip").forEach(c => c.classList.remove("active"));
-        e.currentTarget.classList.add("active");
-        this.delayMinutes = Number(e.currentTarget.dataset.delay);
-        this.isManualDelayOverride = true;
-        this.updateSyncStatusNotice(`Manual Delay Offset: +${this.delayMinutes}m applied`);
-        this.alertTriggered = false;
-        this.updateUI();
-      });
-    });
-
-    // 5. Platform override modal
-    const editPlatformBtn = document.getElementById("editPlatformBtn");
-    if (editPlatformBtn) {
-      editPlatformBtn.addEventListener("click", () => this.openPlatformModal());
-    }
-
-    const savePlatformBtn = document.getElementById("savePlatformBtn");
-    if (savePlatformBtn) {
-      savePlatformBtn.addEventListener("click", () => this.savePlatformOverride());
-    }
-
-    const resetPlatformBtn = document.getElementById("resetPlatformBtn");
-    if (resetPlatformBtn) {
-      resetPlatformBtn.addEventListener("click", () => this.resetPlatformOverrides());
-    }
-
-    // 6. API settings modal
+    // 4. API settings modal
     const apiSettingsBtn = document.getElementById("apiSettingsBtn");
     if (apiSettingsBtn) {
       apiSettingsBtn.addEventListener("click", () => this.openApiModal());
@@ -372,32 +342,32 @@ class TrainTrackerApp {
     }
   }
 
-  // Platform lookup with manual override priority
+  // Platform lookup with automated live API priority and official Southern Railway suburban allocations
   getEffectivePlatform(stationCode) {
-    if (this.platformOverrides[stationCode]) {
+    if (this.livePlatforms && this.livePlatforms[stationCode]) {
       return {
-        number: this.platformOverrides[stationCode],
-        isOverridden: true
+        number: this.livePlatforms[stationCode],
+        isLive: true
       };
     }
 
-    // Default Southern Railway Platform Allocations:
+    // Default Southern Railway Chennai Suburban Platform Allocations:
     // 49007 (Down Fast): MS = 10, TBM = 7, CGL = 5
     // 49002 (Up Fast): CGL = 4, TBM = 8, MS = 11
     if (this.currentTrainId === "49007") {
-      if (stationCode === "MS") return { number: "10", isOverridden: false };
-      if (stationCode === "CGL") return { number: "5", isOverridden: false };
-      if (stationCode === "TBM") return { number: "7", isOverridden: false };
+      if (stationCode === "MS") return { number: (this.livePlatforms && this.livePlatforms["MS"]) || "10", isLive: Boolean(this.livePlatforms && this.livePlatforms["MS"]) };
+      if (stationCode === "CGL") return { number: (this.livePlatforms && this.livePlatforms["CGL"]) || "5", isLive: Boolean(this.livePlatforms && this.livePlatforms["CGL"]) };
+      if (stationCode === "TBM") return { number: (this.livePlatforms && this.livePlatforms["TBM"]) || "7", isLive: Boolean(this.livePlatforms && this.livePlatforms["TBM"]) };
     } else {
-      if (stationCode === "CGL") return { number: "4", isOverridden: false };
-      if (stationCode === "MS") return { number: "11", isOverridden: false };
-      if (stationCode === "TBM") return { number: "8", isOverridden: false };
+      if (stationCode === "CGL") return { number: (this.livePlatforms && this.livePlatforms["CGL"]) || "4", isLive: Boolean(this.livePlatforms && this.livePlatforms["CGL"]) };
+      if (stationCode === "MS") return { number: (this.livePlatforms && this.livePlatforms["MS"]) || "11", isLive: Boolean(this.livePlatforms && this.livePlatforms["MS"]) };
+      if (stationCode === "TBM") return { number: (this.livePlatforms && this.livePlatforms["TBM"]) || "8", isLive: Boolean(this.livePlatforms && this.livePlatforms["TBM"]) };
     }
 
     const stop = this.trainData.schedule.find(s => s.code === stationCode);
     return {
       number: stop ? stop.platform : "--",
-      isOverridden: false
+      isLive: false
     };
   }
 
@@ -924,8 +894,8 @@ class TrainTrackerApp {
         if (response.ok) {
           const data = await response.json();
           if (data && data.data) {
-            // Apply delay if reported and user hasn't locked manual override
-            if (typeof data.data.delay === "number" && !this.isManualDelayOverride) {
+            // Apply delay if reported
+            if (typeof data.data.delay === "number") {
               const apiDelay = Math.max(0, Math.round(data.data.delay));
               this.applyDelayValue(apiDelay);
             }
@@ -934,8 +904,8 @@ class TrainTrackerApp {
             const targetCode = this.alertTargetMode === "boarding" ? this.boardingStation : this.destStation;
             if (Array.isArray(data.data.stations)) {
               const stMatch = data.data.stations.find(s => s.stationCode === targetCode);
-              if (stMatch && stMatch.platformNumber && !this.platformOverrides[targetCode]) {
-                this.platformOverrides[targetCode] = String(stMatch.platformNumber);
+              if (stMatch && stMatch.platformNumber) {
+                this.livePlatforms[targetCode] = String(stMatch.platformNumber);
               }
             }
 
@@ -959,14 +929,12 @@ class TrainTrackerApp {
           const json = await res.json();
           if (json && json.success && json.data) {
             const live = json.data;
-            if (typeof live.delayMinutes === "number" && !this.isManualDelayOverride) {
+            if (typeof live.delayMinutes === "number") {
               this.applyDelayValue(live.delayMinutes);
             }
             if (live.platformNumber) {
               const targetCode = this.alertTargetMode === "boarding" ? this.boardingStation : this.destStation;
-              if (!this.platformOverrides[targetCode]) {
-                this.platformOverrides[targetCode] = String(live.platformNumber);
-              }
+              this.livePlatforms[targetCode] = String(live.platformNumber);
             }
             const delayTxt = this.delayMinutes === 0 ? "On Time" : `+${this.delayMinutes}m`;
             this.updateSyncStatusNotice(`Live Feed Synced (${delayTxt})`);
@@ -985,8 +953,6 @@ class TrainTrackerApp {
   }
 
   runAutonomousSuburbanSync() {
-    if (this.isManualDelayOverride) return;
-
     const now = this.getCurrentTime();
     const hours = now.getHours();
     const minutes = now.getMinutes();
@@ -1019,13 +985,20 @@ class TrainTrackerApp {
   }
 
   applyDelayValue(delayVal) {
-    this.delayMinutes = delayVal;
+    this.delayMinutes = Math.max(0, Number(delayVal) || 0);
 
-    // Synchronize delay chips in the UI
-    document.querySelectorAll(".delay-chip").forEach(c => {
-      const chipVal = Number(c.dataset.delay);
-      c.classList.toggle("active", chipVal === this.delayMinutes);
-    });
+    // Update automated reported delay pill in UI
+    const delayPill = document.getElementById("delayStatusPill");
+    const delayText = document.getElementById("delayStatusText");
+    if (delayPill && delayText) {
+      if (this.delayMinutes === 0) {
+        delayPill.className = "delay-status-pill on-time";
+        delayText.textContent = "On Time";
+      } else {
+        delayPill.className = "delay-status-pill delayed";
+        delayText.textContent = `+${this.delayMinutes}m Delay`;
+      }
+    }
   }
 
   updateSyncStatusNotice(text) {
@@ -1033,56 +1006,6 @@ class TrainTrackerApp {
     if (noticeEl) {
       noticeEl.textContent = text;
     }
-  }
-
-  // Platform Edit Modal
-  openPlatformModal() {
-    const targetCode = this.alertTargetMode === "boarding" ? this.boardingStation : this.destStation;
-    const stop = this.trainData.schedule.find(s => s.code === targetCode);
-    if (!stop) return;
-
-    const modal = document.getElementById("platformModal");
-    const modalTitle = document.getElementById("platformModalStationName");
-    const input = document.getElementById("platformNumberInput");
-
-    if (modalTitle) modalTitle.textContent = `${stop.name} (${stop.code})`;
-    if (input) {
-      input.dataset.station = targetCode;
-      const currentPf = this.getEffectivePlatform(targetCode).number;
-      input.value = currentPf !== "--" ? currentPf : "";
-      input.placeholder = `Default: ${stop.platform}`;
-    }
-
-    if (modal) modal.style.display = "flex";
-  }
-
-  savePlatformOverride() {
-    const input = document.getElementById("platformNumberInput");
-    if (!input) return;
-
-    const stationCode = input.dataset.station;
-    const newPf = input.value.trim();
-
-    if (newPf) {
-      this.platformOverrides[stationCode] = newPf;
-    } else {
-      delete this.platformOverrides[stationCode];
-    }
-
-    localStorage.setItem("platform_overrides", JSON.stringify(this.platformOverrides));
-
-    const modal = document.getElementById("platformModal");
-    if (modal) modal.style.display = "none";
-
-    this.updateUI();
-  }
-
-  resetPlatformOverrides() {
-    this.platformOverrides = {};
-    localStorage.removeItem("platform_overrides");
-    const modal = document.getElementById("platformModal");
-    if (modal) modal.style.display = "none";
-    this.updateUI();
   }
 
   // API Modal
@@ -1098,7 +1021,6 @@ class TrainTrackerApp {
     if (keyInput) {
       this.apiConfig.rapidApiKey = keyInput.value.trim();
       localStorage.setItem("railway_api_config", JSON.stringify(this.apiConfig));
-      this.isManualDelayOverride = false;
       this.syncLiveTrainStatus();
     }
     const modal = document.getElementById("apiSettingsModal");
@@ -1294,7 +1216,10 @@ class TrainTrackerApp {
       btn.classList.toggle("active", btn.dataset.train === this.currentTrainId);
     });
 
-    // 7. Calculate and update all live widgets
+    // 7. Synchronize automated delay pill
+    this.applyDelayValue(this.delayMinutes);
+
+    // 8. Calculate and update all live widgets
     try {
       const status = this.calculateTrainStatus();
       this.updateClockDisplay();

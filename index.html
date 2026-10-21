@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=26.0">
+  <link rel="stylesheet" href="styles.css?v=27.0">
 </head>
 <body>
 
@@ -184,20 +184,16 @@
               <div class="pf-label">Platform</div>
               <div class="pf-number" id="targetPlatformDisplay">10</div>
             </div>
-            <button id="editPlatformBtn" class="edit-pf-btn">Change PF</button>
           </div>
         </div>
       </section>
 
-      <!-- Live Delay Adjustment Strip -->
+      <!-- Live Delay Status Strip (Automated from Live API / Southern Railway) -->
       <div class="delay-control-strip">
         <span class="delay-label">Reported Delay:</span>
-        <div class="delay-chips-row">
-          <button class="delay-chip active" data-delay="0">On Time</button>
-          <button class="delay-chip" data-delay="5">+5m</button>
-          <button class="delay-chip" data-delay="10">+10m</button>
-          <button class="delay-chip" data-delay="15">+15m</button>
-          <button class="delay-chip" data-delay="30">+30m</button>
+        <div id="delayStatusPill" class="delay-status-pill on-time">
+          <span class="delay-status-dot"></span>
+          <span id="delayStatusText">On Time</span>
         </div>
       </div>
 
@@ -267,24 +263,6 @@
     </div>
   </div>
 
-  <!-- PLATFORM OVERRIDE MODAL -->
-  <div id="platformModal" class="modal-backdrop">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 id="platformModalStationName">Edit Platform</h3>
-        <button class="close-btn close-modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p>If Southern Railway announcer or station display shows a different platform, override it below:</p>
-        <input type="text" id="platformNumberInput" placeholder="e.g. 10, 9, 4">
-      </div>
-      <div class="modal-actions">
-        <button id="resetPlatformBtn" class="btn-secondary">Reset to Default</button>
-        <button id="savePlatformBtn" class="btn-primary">Save Platform</button>
-      </div>
-    </div>
-  </div>
-
   <!-- DATA SOURCE & API MODAL -->
   <div id="apiSettingsModal" class="modal-backdrop">
     <div class="modal-content">
@@ -321,18 +299,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v26.0) -->
-  <script src="data/trains.js?v=26.0"></script>
-  <script src="audio/chime.js?v=26.0"></script>
-  <script src="threeui-engine.js?v=26.0"></script>
-  <script src="app.js?v=26.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v27.0) -->
+  <script src="data/trains.js?v=27.0"></script>
+  <script src="audio/chime.js?v=27.0"></script>
+  <script src="threeui-engine.js?v=27.0"></script>
+  <script src="app.js?v=27.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=26.0')
+        navigator.serviceWorker.register('sw.js?v=27.0')
           .then(reg => {
-            console.log('Service Worker v26.0 active', reg);
+            console.log('Service Worker v27.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;

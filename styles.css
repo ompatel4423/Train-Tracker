@@ -1128,20 +1128,6 @@ body {
   margin-top: 2px;
 }
 
-.edit-pf-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-dim);
-  font-size: 0.68rem;
-  cursor: pointer;
-  padding: 2px 4px;
-}
-
-.edit-pf-btn:hover {
-  color: var(--accent-cyan);
-  text-decoration: underline;
-}
-
 /* Quick Action Toolbar */
 .quick-action-strip {
   display: flex;
@@ -1201,28 +1187,44 @@ body {
   flex-shrink: 0;
 }
 
-.delay-chips-row {
-  display: flex;
-  gap: 3px;
-  flex-shrink: 0;
-}
-
-.delay-chip {
-  background: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  font-size: 0.66rem;
+/* Automated Delay Status Pill */
+.delay-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
   font-weight: 700;
-  padding: 3px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  white-space: nowrap;
+  font-family: var(--font-mono);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
 }
 
-.delay-chip.active {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
+.delay-status-pill.on-time {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #34D399;
+}
+
+.delay-status-pill.delayed {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #FBBF24;
+}
+
+.delay-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 6px currentColor;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
 /* Route Timeline Section */
