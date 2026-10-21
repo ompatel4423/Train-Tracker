@@ -114,8 +114,7 @@ git clone https://github.com/ompatel4423/Train-Tracker.git
 cd Train-Tracker
 
 # Start the native local server
-npm start
-# or: node dev-server.js
+node scripts/dev-server.js
 
 # Open in browser
 open http://localhost:3000
