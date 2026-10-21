@@ -1,14 +1,14 @@
-// Service Worker for Chennai AC Local Train Tracker (v22.0 Netlify Buttons Live)
+// Service Worker for Chennai AC Local Train Tracker (v23.0 Interactive Animated Ball Live)
 // Strategy: Network-First with Cache Fallback & Instant Auto-Purge of Old Caches
-const CACHE_NAME = 'cgl-ms-tracker-v22-buttons';
+const CACHE_NAME = 'cgl-ms-tracker-v23-ball-move';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=22.0',
-  './threeui-engine.js?v=22.0',
-  './app.js?v=22.0',
-  './data/trains.js?v=22.0',
-  './audio/chime.js?v=22.0',
+  './styles.css?v=23.0',
+  './threeui-engine.js?v=23.0',
+  './app.js?v=23.0',
+  './data/trains.js?v=23.0',
+  './audio/chime.js?v=23.0',
   './icon.jpg',
   './manifest.json'
 ];

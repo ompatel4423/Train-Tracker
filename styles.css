@@ -233,6 +233,7 @@ body {
   border: 1px solid transparent;
   cursor: pointer !important;
   pointer-events: auto !important;
+  touch-action: manipulation !important;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -343,6 +344,7 @@ body {
   border-radius: 9999px;
   cursor: pointer !important;
   pointer-events: auto !important;
+  touch-action: manipulation !important;
   overflow: hidden;
   background: #030712;
   border: 1.5px solid rgba(255, 255, 255, 0.14);
@@ -376,7 +378,46 @@ body {
   opacity: 0;
   z-index: 20;
   pointer-events: auto !important;
+  touch-action: manipulation !important;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Graceful CSS 3D ball fallback if WebGL is unsupported or disabled on device */
+.shader-toggle.webgl-fallback .shader-toggle__switch {
+  opacity: 1;
+}
+
+.shader-toggle.webgl-fallback .shader-toggle__switch::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.35s ease;
+  pointer-events: none;
+}
+
+.shader-toggle-train.webgl-fallback[data-state="off"] .shader-toggle__switch::before {
+  transform: translateX(0);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fde68a 40%, #d97706 100%);
+}
+
+.shader-toggle-train.webgl-fallback[data-state="on"] .shader-toggle__switch::before {
+  transform: translateX(52px);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #bae6fd 40%, #0284c7 100%);
+}
+
+.shader-toggle-target.webgl-fallback[data-state="off"] .shader-toggle__switch::before {
+  transform: translateX(0);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #a7f3d0 40%, #059669 100%);
+}
+
+.shader-toggle-target.webgl-fallback[data-state="on"] .shader-toggle__switch::before {
+  transform: translateX(52px);
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #fecdd3 40%, #e11d48 100%);
 }
 
 .shader-toggle-train[data-state="off"] {

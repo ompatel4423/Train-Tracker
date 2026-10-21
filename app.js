@@ -147,23 +147,48 @@ class TrainTrackerApp {
     // 1. Train Selection Buttons (Side labels on top toggle)
     document.querySelectorAll(".skeuo-label-side[data-train]").forEach(btn => {
       btn.addEventListener("click", (e) => {
+        e.preventDefault();
         const trainId = e.currentTarget.dataset.train;
         if (trainId) this.selectTrain(trainId);
       });
     });
 
+    // 1b. Train Toggle Switch Capsule & Ball (Interactive 3D WebGL Switch)
+    const trainToggleContainer = document.getElementById("skeuoTrainToggle");
+    if (trainToggleContainer) {
+      trainToggleContainer.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Toggle between Morning 49002 (Left / OFF) and Evening 49007 (Right / ON)
+        const nextTrain = this.currentTrainId === "49007" ? "49002" : "49007";
+        this.selectTrain(nextTrain);
+      });
+    }
+
     // 2. Target Mode Selection Buttons (Boarding vs Deboarding side buttons)
     const boardBtn = document.getElementById("targetModeBoardBtn");
     if (boardBtn) {
-      boardBtn.addEventListener("click", () => {
+      boardBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         this.setAlertTargetMode("boarding");
       });
     }
 
     const deboardBtn = document.getElementById("targetModeDeboardBtn");
     if (deboardBtn) {
-      deboardBtn.addEventListener("click", () => {
+      deboardBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         this.setAlertTargetMode("dest");
+      });
+    }
+
+    // 2b. Target Mode Toggle Switch Capsule & Ball (Interactive 3D WebGL Switch)
+    const targetToggleContainer = document.getElementById("skeuoTargetToggle");
+    if (targetToggleContainer) {
+      targetToggleContainer.addEventListener("click", (e) => {
+        e.preventDefault();
+        // Toggle between Boarding (Left / OFF) and Deboarding (Right / ON)
+        const nextMode = this.alertTargetMode === "boarding" ? "dest" : "boarding";
+        this.setAlertTargetMode(nextMode);
       });
     }
 
@@ -272,9 +297,21 @@ class TrainTrackerApp {
       btn.classList.toggle("active", btn.dataset.train === trainId);
     });
 
-    // Sync WebGL shader train toggle
-    if (window.threeuiTrainToggle) {
-      window.threeuiTrainToggle.syncState(trainId === "49007");
+    const isEvening = (trainId === "49007");
+
+    // Explicitly update DOM state attributes for immediate styling & border glow
+    const trainToggleEl = document.getElementById("skeuoTrainToggle");
+    if (trainToggleEl) {
+      trainToggleEl.setAttribute("data-state", isEvening ? "on" : "off");
+      const switchBtn = trainToggleEl.querySelector(".shader-toggle__switch");
+      if (switchBtn) {
+        switchBtn.setAttribute("aria-checked", isEvening ? "true" : "false");
+      }
+    }
+
+    // Sync WebGL shader train toggle ball (glide to left for 49002, glide to right for 49007)
+    if (window.threeuiTrainToggle && typeof window.threeuiTrainToggle.syncState === "function") {
+      window.threeuiTrainToggle.syncState(isEvening);
     }
 
     // Keep user's target mode in sync with shader target toggle
@@ -312,8 +349,18 @@ class TrainTrackerApp {
   updateTargetToggleUI() {
     const isDeboard = this.alertTargetMode === "dest";
 
-    // Sync WebGL shader target toggle
-    if (window.threeuiTargetToggle) {
+    // Explicitly update DOM state attributes for immediate styling & border glow
+    const targetToggleEl = document.getElementById("skeuoTargetToggle");
+    if (targetToggleEl) {
+      targetToggleEl.setAttribute("data-state", isDeboard ? "on" : "off");
+      const switchBtn = targetToggleEl.querySelector(".shader-toggle__switch");
+      if (switchBtn) {
+        switchBtn.setAttribute("aria-checked", isDeboard ? "true" : "false");
+      }
+    }
+
+    // Sync WebGL shader target toggle ball (glide to left for Boarding, right for Deboarding)
+    if (window.threeuiTargetToggle && typeof window.threeuiTargetToggle.syncState === "function") {
       window.threeuiTargetToggle.syncState(isDeboard);
     }
 

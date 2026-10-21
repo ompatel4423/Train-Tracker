@@ -1,4 +1,4 @@
-﻿// =========================================================================
+// =========================================================================
 // ThreeUI Engine for Chennai AC Local Train Tracker
 // Integrates:
 // 1. PortalFieldCollection (variant="flow-field") Background
@@ -448,16 +448,27 @@ function createShaderToggleWebGLScene(canvas, options) {
 
   function render(now) {
     if (!isRunning) return;
-    const dt = Math.min(0.05, (now - lastNow) / 1000);
-    lastNow = now;
+    const currentTime = (typeof now === "number" && now > 0) ? now : performance.now();
+    const dt = Math.max(0, Math.min(0.05, (currentTime - lastNow) / 1000));
+    lastNow = currentTime;
     simTime += dt * opts.speed;
 
     if (progress !== targetProgress) {
-      const elapsed = now - animStartTime;
+      const elapsed = Math.max(0, currentTime - animStartTime);
       const t = Math.min(1.0, elapsed / DURATION);
       const easedT = cubicBezierEasing(t);
       progress = startProgress + (targetProgress - startProgress) * easedT;
       if (t >= 1.0) progress = targetProgress;
+    }
+
+    const cssW = canvas.clientWidth || 96;
+    const cssH = canvas.clientHeight || 44;
+    const targetW = Math.round(cssW * dpr);
+    const targetH = Math.round(cssH * dpr);
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+      gl.viewport(0, 0, targetW, targetH);
     }
 
     const unit = Math.min(canvas.width / 5.2, canvas.height / 2.3);
@@ -520,11 +531,19 @@ class ThreeUISkeuomorphicToggle {
       }
     }
 
+    if (!this.scene) {
+      this.container.classList.add("webgl-fallback");
+    }
+
     window.addEventListener("resize", () => {
       if (this.scene) this.scene.resize();
     });
 
     this.updateUI();
+  }
+
+  toggle() {
+    this.syncState(!this.isRight);
   }
 
   syncState(isRight) {
