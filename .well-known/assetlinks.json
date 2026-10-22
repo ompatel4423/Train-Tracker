@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.train_tracker4423.twa",
+    "sha256_cert_fingerprints": [
+      "83:47:D7:47:A6:11:B9:35:FF:CE:A2:3F:0A:94:1E:23:07:F3:E6:5C:63:92:35:FE:E6:8E:7B:9E:CF:1F:4E:0F"
+    ]
+  }
+}]
