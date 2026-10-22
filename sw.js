@@ -1,14 +1,16 @@
-// Service Worker for Chennai AC Local Train Tracker (v29.0 Manual Refresh & Quota Protection)
+// Service Worker for Chennai AC Local Train Tracker (v30.0 PWABuilder Store Packaging Ready)
 // Strategy: Network-First with Cache Fallback & Instant Auto-Purge of Old Caches
-const CACHE_NAME = 'cgl-ms-tracker-v29-manual-refresh';
+const CACHE_NAME = 'cgl-ms-tracker-v30-apk-ready';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './styles.css?v=29.0',
-  './threeui-engine.js?v=29.0',
-  './app.js?v=29.0',
-  './data/trains.js?v=29.0',
-  './audio/chime.js?v=29.0',
+  './styles.css?v=30.0',
+  './threeui-engine.js?v=30.0',
+  './app.js?v=30.0',
+  './data/trains.js?v=30.0',
+  './audio/chime.js?v=30.0',
+  './icon-192.png',
+  './icon-512.png',
   './icon.jpg',
   './manifest.json'
 ];

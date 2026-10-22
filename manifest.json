@@ -1,18 +1,49 @@
 {
+  "id": "/",
   "name": "Chennai AC Local Train Tracker",
   "short_name": "CGL-MS AC Tracker",
   "description": "Daily commuter assistant for Chengalpattu to Chennai Egmore AC Local Trains (49007 / 49002)",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#090D16",
   "theme_color": "#090D16",
   "orientation": "portrait-primary",
+  "categories": ["travel", "utilities"],
   "icons": [
     {
-      "src": "icon.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.jpg",
+      "sizes": "1024x1024",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Train Tracker Live HUD & Timetable"
+    },
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Train Tracker Desktop View"
     }
   ]
 }

@@ -14,10 +14,10 @@
   
   <title>Chennai AC Local Commuter | CGL ⇄ MS Tracker</title>
   
-  <link rel="icon" type="image/jpeg" href="icon.jpg">
-  <link rel="apple-touch-icon" href="icon.jpg">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-512.png">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=29.0">
+  <link rel="stylesheet" href="styles.css?v=30.0">
 </head>
 <body>
 
@@ -299,18 +299,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v29.0) -->
-  <script src="data/trains.js?v=29.0"></script>
-  <script src="audio/chime.js?v=29.0"></script>
-  <script src="threeui-engine.js?v=29.0"></script>
-  <script src="app.js?v=29.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v30.0) -->
+  <script src="data/trains.js?v=30.0"></script>
+  <script src="audio/chime.js?v=30.0"></script>
+  <script src="threeui-engine.js?v=30.0"></script>
+  <script src="app.js?v=30.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=29.0')
+        navigator.serviceWorker.register('sw.js?v=30.0')
           .then(reg => {
-            console.log('Service Worker v29.0 active', reg);
+            console.log('Service Worker v30.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;
