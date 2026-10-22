@@ -17,7 +17,7 @@
   <link rel="icon" type="image/jpeg" href="icon.jpg">
   <link rel="apple-touch-icon" href="icon.jpg">
   <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css?v=28.0">
+  <link rel="stylesheet" href="styles.css?v=29.0">
 </head>
 <body>
 
@@ -44,6 +44,7 @@
         </div>
 
         <div class="header-actions">
+          <button id="manualRefreshBtn" class="icon-btn refresh-btn" title="Refresh Live Train Status">🔄</button>
           <button id="wakeLockBtn" class="icon-btn" title="Keep screen awake while commuting">💡</button>
           <button id="apiSettingsBtn" class="icon-btn" title="Data Source & Live API Settings">⚙️</button>
         </div>
@@ -174,8 +175,8 @@
               })();
             </script>
             <div class="countdown-human-badge board-mode" id="countdownHumanBadge">🚆 Arrives at Chennai Egmore at 18:27 (Platform 10)</div>
-            <div class="auto-sync-status-line" id="liveSyncNotice">
-              <span class="sync-dot"></span> <span id="syncNoticeText">Southern Railway Live Timetable Synced</span>
+            <div class="auto-sync-status-line" id="liveSyncNotice" title="Tap to refresh live status">
+              <span class="sync-dot"></span> <span id="syncNoticeText">Southern Railway Live Timetable Synced</span> <span class="sync-refresh-hint">↻</span>
             </div>
           </div>
 
@@ -298,18 +299,18 @@
     </div>
   </div>
 
-  <!-- Scripts with cache busting to guarantee immediate live updates (v28.0) -->
-  <script src="data/trains.js?v=28.0"></script>
-  <script src="audio/chime.js?v=28.0"></script>
-  <script src="threeui-engine.js?v=28.0"></script>
-  <script src="app.js?v=28.0"></script>
+  <!-- Scripts with cache busting to guarantee immediate live updates (v29.0) -->
+  <script src="data/trains.js?v=29.0"></script>
+  <script src="audio/chime.js?v=29.0"></script>
+  <script src="threeui-engine.js?v=29.0"></script>
+  <script src="app.js?v=29.0"></script>
   <script>
     // Automatic Service Worker registration with instant background update
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js?v=28.0')
+        navigator.serviceWorker.register('sw.js?v=29.0')
           .then(reg => {
-            console.log('Service Worker v28.0 active', reg);
+            console.log('Service Worker v29.0 active', reg);
             reg.update();
             reg.addEventListener('updatefound', () => {
               const worker = reg.installing;

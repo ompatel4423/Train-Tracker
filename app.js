@@ -78,11 +78,9 @@ class TrainTrackerApp {
       try { this.tick(); } catch (e) { console.error("Tick error:", e); }
     }, 1000);
 
-    // Initial Live Sync & 30-second background polling
+    // Initial Live Sync on app open (Manual / Foreground Refresh Strategy)
     try { this.syncLiveTrainStatus(); } catch (e) { console.warn("Live sync error:", e); }
-    this.apiInterval = setInterval(() => {
-      try { this.syncLiveTrainStatus(); } catch (e) { console.warn("Live sync error:", e); }
-    }, 30000);
+    this.apiInterval = null; // No background interval loop to preserve API quota!
   }
 
   loadSavedPreferences() {
@@ -191,14 +189,48 @@ class TrainTrackerApp {
       });
     }
 
-    // 3. Live Timetable Sync Indicator (refresh on click)
-    const syncPill = document.querySelector(".live-timetable-pill");
-    if (syncPill) {
-      syncPill.addEventListener("click", () => {
-        this.syncLiveTrainStatus();
+    // 3. Manual Live Refresh handlers (Header button, Sync notice, Delay pill)
+    const handleManualRefresh = async () => {
+      const refreshBtn = document.getElementById("manualRefreshBtn");
+      const hint = document.querySelector(".sync-refresh-hint");
+      if (refreshBtn) refreshBtn.classList.add("spinning");
+      if (hint) hint.classList.add("spinning");
+      try {
+        await this.syncLiveTrainStatus();
         this.updateUI();
-      });
+      } finally {
+        setTimeout(() => {
+          if (refreshBtn) refreshBtn.classList.remove("spinning");
+          if (hint) hint.classList.remove("spinning");
+        }, 600);
+      }
+    };
+
+    const refreshBtn = document.getElementById("manualRefreshBtn");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", handleManualRefresh);
     }
+
+    const liveSyncNotice = document.getElementById("liveSyncNotice");
+    if (liveSyncNotice) {
+      liveSyncNotice.addEventListener("click", handleManualRefresh);
+    }
+
+    const delayStatusPill = document.getElementById("delayStatusPill");
+    if (delayStatusPill) {
+      delayStatusPill.addEventListener("click", handleManualRefresh);
+    }
+
+    // Refresh when user returns to app/tab (if > 2 minutes have elapsed)
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        const now = Date.now();
+        if (!this.lastSyncTimestamp || (now - this.lastSyncTimestamp) > 120000) {
+          this.syncLiveTrainStatus();
+          this.updateUI();
+        }
+      }
+    });
 
     // 4. API settings modal
     const apiSettingsBtn = document.getElementById("apiSettingsBtn");
@@ -879,6 +911,9 @@ class TrainTrackerApp {
 
   // Automated Real-Time Live Sync: Delays & Southern Railway Platforms
   async syncLiveTrainStatus() {
+    this.lastSyncTimestamp = Date.now();
+    const timeStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
     // 1. If RapidAPI key is configured, query official IRCTC/NTES live endpoint
     if (this.apiConfig && this.apiConfig.rapidApiKey) {
       try {
@@ -909,7 +944,7 @@ class TrainTrackerApp {
               }
             }
 
-            this.updateSyncStatusNotice(`IRCTC Live Feed Synced (${this.delayMinutes === 0 ? "On Time" : `+${this.delayMinutes}m`})`);
+            this.updateSyncStatusNotice(`IRCTC Live Synced (${this.delayMinutes === 0 ? "On Time" : `+${this.delayMinutes}m`}) · ${timeStr}`);
             this.updateUI();
             return;
           }
@@ -937,7 +972,7 @@ class TrainTrackerApp {
               this.livePlatforms[targetCode] = String(live.platformNumber);
             }
             const delayTxt = this.delayMinutes === 0 ? "On Time" : `+${this.delayMinutes}m`;
-            this.updateSyncStatusNotice(`Live Feed Synced (${delayTxt})`);
+            this.updateSyncStatusNotice(`Live Feed Synced (${delayTxt}) · ${timeStr}`);
             this.updateUI();
             return;
           }
@@ -953,35 +988,36 @@ class TrainTrackerApp {
   }
 
   runAutonomousSuburbanSync() {
+    const timeStr = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
     const now = this.getCurrentTime();
     const hours = now.getHours();
     const minutes = now.getMinutes();
     const timeVal = hours * 60 + minutes;
 
     let computedDelay = 0;
-    let statusMsg = "Southern Railway Live Timetable Synced · On Time";
+    let statusMsg = "Southern Railway Timetable Synced · On Time";
 
     if (this.currentTrainId === "49007") {
       // Evening Suburban Corridor (Peak hours: 18:00 - 20:00)
       // Between 18:35 and 19:15 (Mambalam to Tambaram), suburban dispatch holds typically produce 5m delay
       if (timeVal >= 18 * 60 + 35 && timeVal <= 19 * 60 + 15) {
         computedDelay = 5;
-        statusMsg = "Southern Railway Suburban Dispatch: +5m section delay auto-applied";
+        statusMsg = "Southern Railway Suburban Dispatch: +5m hold";
       } else if (timeVal > 19 * 60 + 15 && timeVal <= 19 * 60 + 45) {
         computedDelay = 5;
-        statusMsg = "Southern Railway Suburban Dispatch: +5m section delay auto-applied";
+        statusMsg = "Southern Railway Suburban Dispatch: +5m hold";
       }
     } else {
       // Morning Suburban Corridor (Peak hours: 07:30 - 08:45)
       // Between 08:00 and 08:35 (Tambaram to Egmore up line)
       if (timeVal >= 8 * 60 && timeVal <= 8 * 60 + 35) {
         computedDelay = 5;
-        statusMsg = "Southern Railway Suburban Dispatch: +5m section delay auto-applied";
+        statusMsg = "Southern Railway Suburban Dispatch: +5m hold";
       }
     }
 
     this.applyDelayValue(computedDelay);
-    this.updateSyncStatusNotice(statusMsg);
+    this.updateSyncStatusNotice(`${statusMsg} · ${timeStr}`);
   }
 
   applyDelayValue(delayVal) {
